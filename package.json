@@ -1,6 +1,6 @@
 {
   "name": "markvia",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -10,11 +10,16 @@
     "check": "vp check",
     "test": "vp test",
     "build": "pnpm -r --if-present run build",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "pnpm build && changeset publish",
+    "release:check": "changeset status --since=release",
     "docs:dev": "pnpm --filter @markvia/docs dev",
     "docs:build": "pnpm --filter @markvia/docs build",
     "docs:preview": "pnpm --filter @markvia/docs preview"
   },
   "devDependencies": {
+    "@changesets/cli": "^3.0.1",
     "@types/node": "^24.0.0",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
