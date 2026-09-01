@@ -2,18 +2,19 @@
 
 Universal Markdown Runtime for static, streaming and interactive content.
 
-Markvia 将 Markdown 解析为统一的 Semantic AST 和 Render IR，再适配到 HTML、React 和 Vue。首版使用自研 parser，优先建立框架无关的运行时契约。
+Markvia 将 Markdown 解析为统一的 Semantic AST 和 Render IR，再适配到 HTML、React 和 Vue。解析基线固定为 CommonMark 0.29 + 正式 GFM 0.29。
 
 ## 当前能力
 
-- 标题、段落、强调、加粗、删除线、行内代码
-- 链接、图片、有序/无序列表、引用和 fenced code
+- CommonMark 0.29 的区块、容器和行内语法
+- GFM 0.29 的表格、任务列表、删除线和扩展自动链接
+- 引用链接/图片、HTML block、raw HTML、硬换行和 fenced code 元数据
 - 稳定节点 ID 与块级增量 Markdown stream
-- 安全 HTML renderer、React renderer、Vue renderer
+- 默认安全的 HTML、React、Vue renderer
 - 可插拔 AST/IR transform 与代码高亮 hook
 - Node.js `>=24`
 
-首版暂不承诺完整 CommonMark/GFM，也暂不包含 Shiki、Math、Mermaid、Component Markdown 或 CLI。
+HTML renderer 可通过 `createHTMLRenderer({ allowRawHtml: true })` 开启兼容模式；默认会转义 raw HTML，React/Vue 始终按文本安全输出。基线不包含脚注、Alerts、MDX、frontmatter、issue/PR 引用或 emoji 等 GitHub 产品层扩展，也暂不包含 Shiki、Math、Mermaid、Component Markdown 或 CLI。
 
 ## 使用
 

@@ -13,6 +13,13 @@ export type NodeType =
   | 'listItem'
   | 'blockquote'
   | 'code'
+  | 'thematicBreak'
+  | 'break'
+  | 'html'
+  | 'definition'
+  | 'table'
+  | 'tableRow'
+  | 'tableCell'
 
 export interface Point {
   offset: number
@@ -90,11 +97,14 @@ export interface ListNode extends BaseNode {
   type: 'list'
   ordered: boolean
   start: number | null
+  spread: boolean
   children: ListItemNode[]
 }
 
 export interface ListItemNode extends BaseNode {
   type: 'listItem'
+  checked: boolean | null
+  spread: boolean
   children: MarkdownNode[]
 }
 
@@ -106,8 +116,49 @@ export interface BlockquoteNode extends BaseNode {
 export interface CodeNode extends BaseNode {
   type: 'code'
   language: string | null
+  meta: string | null
   value: string
   incomplete: boolean
+}
+
+export interface ThematicBreakNode extends BaseNode {
+  type: 'thematicBreak'
+}
+
+export interface BreakNode extends BaseNode {
+  type: 'break'
+}
+
+export interface HtmlNode extends BaseNode {
+  type: 'html'
+  value: string
+  block: boolean
+}
+
+export interface DefinitionNode extends BaseNode {
+  type: 'definition'
+  identifier: string
+  label: string
+  url: string
+  title: string | null
+}
+
+export type TableAlignment = 'left' | 'center' | 'right' | null
+
+export interface TableNode extends BaseNode {
+  type: 'table'
+  alignments: TableAlignment[]
+  children: TableRowNode[]
+}
+
+export interface TableRowNode extends BaseNode {
+  type: 'tableRow'
+  children: TableCellNode[]
+}
+
+export interface TableCellNode extends BaseNode {
+  type: 'tableCell'
+  children: MarkdownNode[]
 }
 
 export type MarkdownNode =
@@ -124,6 +175,13 @@ export type MarkdownNode =
   | ListItemNode
   | BlockquoteNode
   | CodeNode
+  | ThematicBreakNode
+  | BreakNode
+  | HtmlNode
+  | DefinitionNode
+  | TableNode
+  | TableRowNode
+  | TableCellNode
 
 export type MarkdownDocument = DocumentNode
 
@@ -145,7 +203,15 @@ export interface RenderElementNode {
   children: RenderNode[]
 }
 
-export type RenderNode = RenderTextNode | RenderElementNode
+export interface RenderRawNode {
+  kind: 'raw'
+  id: string
+  sourceType: 'html'
+  position: SourcePosition
+  value: string
+}
+
+export type RenderNode = RenderTextNode | RenderElementNode | RenderRawNode
 
 export interface RenderDocument {
   kind: 'root'

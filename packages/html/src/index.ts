@@ -18,6 +18,12 @@ const voidTags = new Set([
 ])
 const safeTag = /^[a-z][a-z0-9-]*$/
 const safeAttribute = /^[a-zA-Z_:][a-zA-Z0-9_.:-]*$/
+const gfmDisallowedHtmlTag =
+  /<(?=\/?(?:iframe|noembed|noframes|plaintext|script|style|textarea|title|xmp)(?:[\t\n\f\r />]|$))/gi
+
+export interface HTMLRendererOptions {
+  allowRawHtml?: boolean
+}
 
 function renderAttributes(node: RenderElementNode): string {
   return Object.entries(node.props)
@@ -32,13 +38,28 @@ function renderAttributes(node: RenderElementNode): string {
     .join('')
 }
 
-function renderNode(node: RenderNode): string {
+function renderRaw(
+  node: Extract<RenderNode, { kind: 'raw' }>,
+  options: HTMLRendererOptions,
+): string {
+  if (!options.allowRawHtml) {
+    return escapeHtml(node.value)
+  }
+
+  return node.value.replace(gfmDisallowedHtmlTag, '&lt;')
+}
+
+function renderNode(node: RenderNode, options: HTMLRendererOptions): string {
   if (node.kind === 'text') {
     return escapeHtml(node.value)
   }
 
+  if (node.kind === 'raw') {
+    return renderRaw(node, options)
+  }
+
   if (!safeTag.test(node.tag)) {
-    return node.children.map(renderNode).join('')
+    return node.children.map((child) => renderNode(child, options)).join('')
   }
 
   const attributes = renderAttributes(node)
@@ -46,17 +67,19 @@ function renderNode(node: RenderNode): string {
     return `<${node.tag}${attributes}>`
   }
 
-  return `<${node.tag}${attributes}>${node.children.map(renderNode).join('')}</${node.tag}>`
+  return `<${node.tag}${attributes}>${node.children
+    .map((child) => renderNode(child, options))
+    .join('')}</${node.tag}>`
 }
 
-export function renderHTML(document: RenderDocument): string {
-  return document.children.map(renderNode).join('')
+export function renderHTML(document: RenderDocument, options: HTMLRendererOptions = {}): string {
+  return document.children.map((node) => renderNode(node, options)).join('')
 }
 
-export function createHTMLRenderer(): Renderer<string> {
+export function createHTMLRenderer(options: HTMLRendererOptions = {}): Renderer<string> {
   return {
     name: 'html',
-    render: renderHTML,
+    render: (ir) => renderHTML(ir, options),
   }
 }
 

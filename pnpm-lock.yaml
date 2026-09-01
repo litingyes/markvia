@@ -20,6 +20,9 @@ importers:
       '@vue/server-renderer':
         specifier: ^3.5.42
         version: 3.5.42
+      parse5:
+        specifier: ^7.3.0
+        version: 7.3.0
       react:
         specifier: ^19.2.8
         version: 19.2.8
@@ -82,7 +85,39 @@ importers:
         specifier: ^3.5.42
         version: 3.5.42(typescript@7.0.2)
 
-  packages/core: {}
+  packages/core:
+    dependencies:
+      mdast-util-from-markdown:
+        specifier: ^2.0.3
+        version: 2.0.3
+      mdast-util-gfm-autolink-literal:
+        specifier: ^2.0.1
+        version: 2.0.1
+      mdast-util-gfm-strikethrough:
+        specifier: ^2.0.0
+        version: 2.0.0
+      mdast-util-gfm-table:
+        specifier: ^2.0.0
+        version: 2.0.0
+      mdast-util-gfm-task-list-item:
+        specifier: ^2.0.0
+        version: 2.0.0
+      micromark-extension-gfm-autolink-literal:
+        specifier: ^2.1.0
+        version: 2.1.0
+      micromark-extension-gfm-strikethrough:
+        specifier: ^2.1.0
+        version: 2.1.0
+      micromark-extension-gfm-table:
+        specifier: ^2.1.1
+        version: 2.1.1
+      micromark-extension-gfm-task-list-item:
+        specifier: ^2.1.0
+        version: 2.1.0
+    devDependencies:
+      '@types/mdast':
+        specifier: ^4.0.4
+        version: 4.0.4
 
   packages/html:
     dependencies:

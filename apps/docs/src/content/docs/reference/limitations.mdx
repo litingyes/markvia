@@ -5,19 +5,18 @@ sidebar:
   order: 3
 ---
 
-当前版本优先建立框架无关的 runtime contract，还没有承诺完整 Markdown 兼容性。
+Markvia 的 Markdown 兼容性基线是 CommonMark 0.29 + 正式 GFM 0.29。`createMarkdown()` 默认启用 GFM，因此同时覆盖 CommonMark 语法；没有单独的严格 CommonMark 模式。
 
-已支持的基础语法包括：
+已覆盖的格式包括：
 
-- 标题、段落、强调、加粗、删除线和行内代码
-- 链接和图片
-- 有序列表、无序列表和引用
-- fenced code block
-- 稳定节点 ID 和块级增量 stream
+- CommonMark 的区块、容器、行内语法、引用链接/图片、HTML block、raw HTML、硬换行和 fenced code
+- GFM 表格、表格对齐、任务列表、删除线和扩展自动链接
+- LF、CRLF、CR、tab、Unicode、无尾部换行、非法 marker、危险 URL 和流式分块边界
+- HTML、React SSR、Vue SSR 的统一 IR 输出，以及稳定节点 ID 和块级增量 stream
 
-暂未承诺或暂未包含：
+有意不包含的扩展或能力：
 
-- 完整 CommonMark / GFM 兼容性
+- 脚注、Alerts、MDX、frontmatter、issue/PR 引用和 emoji 等 GitHub 产品层扩展
 - Shiki
 - Math
 - Mermaid

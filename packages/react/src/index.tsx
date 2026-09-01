@@ -21,6 +21,22 @@ import {
 
 export type ReactMarkdownComponent = ElementType<Record<string, unknown>>
 
+const voidTags = new Set([
+  'area',
+  'base',
+  'br',
+  'col',
+  'embed',
+  'hr',
+  'img',
+  'input',
+  'link',
+  'meta',
+  'source',
+  'track',
+  'wbr',
+])
+
 export interface ReactRendererOptions {
   components?: Partial<Record<MarkdownNode['type'] | 'document', ReactMarkdownComponent>>
 }
@@ -33,13 +49,21 @@ function renderNode(
     return node.value
   }
 
+  if (node.kind === 'raw') {
+    return node.value
+  }
+
   const children = node.children.map((child) => renderNode(child, components))
   const component = components[node.sourceType]
   if (component) {
-    return createElement(component, { ...node.props, key: node.id, node }, children)
+    return voidTags.has(node.tag)
+      ? createElement(component, { ...node.props, key: node.id, node })
+      : createElement(component, { ...node.props, key: node.id, node }, children)
   }
 
-  return createElement(node.tag, { ...node.props, key: node.id }, children)
+  return voidTags.has(node.tag)
+    ? createElement(node.tag, { ...node.props, key: node.id })
+    : createElement(node.tag, { ...node.props, key: node.id }, children)
 }
 
 export function renderReact(ir: RenderDocument, options: ReactRendererOptions = {}): ReactNode {

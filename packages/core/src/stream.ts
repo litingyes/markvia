@@ -53,17 +53,29 @@ function contentKey(node: MarkdownNode): string {
     case 'emphasis':
     case 'strong':
     case 'delete':
-    case 'listItem':
     case 'blockquote':
+    case 'tableCell':
+    case 'tableRow':
       return `${node.type}:${node.children.map(contentKey).join('|')}`
+    case 'listItem':
+      return `${node.type}:${node.checked ?? 'null'}:${node.spread}:${node.children.map(contentKey).join('|')}`
     case 'link':
       return `${node.type}:${node.url}:${node.title ?? ''}:${node.children.map(contentKey).join('|')}`
     case 'image':
       return `${node.type}:${node.url}:${node.alt}:${node.title ?? ''}`
     case 'list':
-      return `${node.type}:${node.ordered}:${node.start ?? ''}:${node.children.map(contentKey).join('|')}`
+      return `${node.type}:${node.ordered}:${node.start ?? ''}:${node.spread}:${node.children.map(contentKey).join('|')}`
     case 'code':
-      return `${node.type}:${node.language ?? ''}:${node.value}:${node.incomplete}`
+      return `${node.type}:${node.language ?? ''}:${node.meta ?? ''}:${node.value}:${node.incomplete}`
+    case 'thematicBreak':
+    case 'break':
+      return node.type
+    case 'html':
+      return `${node.type}:${node.value}`
+    case 'definition':
+      return `${node.type}:${node.identifier}:${node.url}:${node.title ?? ''}`
+    case 'table':
+      return `${node.type}:${node.alignments.join(',')}:${node.children.map(contentKey).join('|')}`
   }
 }
 

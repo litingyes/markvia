@@ -34,6 +34,10 @@ function renderNode(
     return node.value
   }
 
+  if (node.kind === 'raw') {
+    return node.value
+  }
+
   const children = node.children.map((child) => renderNode(child, components))
   const component = components[node.sourceType]
   return component

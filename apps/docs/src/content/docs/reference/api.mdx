@@ -35,7 +35,10 @@ const stream = runtime.createStream()
 import { htmlRenderer, createHTMLRenderer } from '@markvia/html'
 
 const html = runtime.render(source, htmlRenderer)
+const compatibleHtml = runtime.render(source, createHTMLRenderer({ allowRawHtml: true }))
 ```
+
+`htmlRenderer` 默认转义 raw HTML。`allowRawHtml` 仅是 HTML renderer 的兼容选项；React 和 Vue 始终安全输出 raw HTML。
 
 ## React renderer
 
