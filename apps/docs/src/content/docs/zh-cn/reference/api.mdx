@@ -31,6 +31,18 @@ const stream = runtime.createStream()
 
 此外，`parseMarkdown` 和 `documentToIR` 也会导出，适合更底层的使用场景。
 
+## `@markvia/shiki`
+
+```ts
+import { createShikiHighlighter } from '@markvia/shiki'
+
+const highlighter = await createShikiHighlighter({ theme: 'vitesse-dark' })
+const runtime = createMarkdown({ highlighter })
+const html = await runtime.renderAsync(source, htmlRenderer)
+```
+
+该 adapter 会动态加载并缓存内置语言；没有语言或语言未知时使用纯文本 fallback。
+
 ## HTML renderer
 
 ```ts

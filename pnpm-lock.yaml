@@ -134,6 +134,15 @@ importers:
         specifier: '>=18'
         version: 19.2.8
 
+  packages/shiki:
+    dependencies:
+      '@markvia/core':
+        specifier: workspace:*
+        version: link:../core
+      shiki:
+        specifier: ^4.4.3
+        version: 4.4.3
+
   packages/vue:
     dependencies:
       '@markvia/core':

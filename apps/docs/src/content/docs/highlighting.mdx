@@ -3,7 +3,59 @@ title: Code highlighting
 description: Provide synchronous or asynchronous code highlighting through the CodeHighlighter hook.
 ---
 
-Markvia does not bundle a specific highlighting engine. Use the `CodeHighlighter` interface to connect Shiki, Prism, or another implementation.
+Markvia core remains independent of a specific highlighting engine. The optional `@markvia/shiki` package provides a first-party Shiki adapter with dynamic language loading.
+
+## Shiki adapter
+
+```bash
+pnpm add @markvia/core @markvia/html @markvia/shiki
+```
+
+````ts
+import { createMarkdown } from '@markvia/core'
+import { htmlRenderer } from '@markvia/html'
+import { createShikiHighlighter } from '@markvia/shiki'
+
+const highlighter = await createShikiHighlighter({ theme: 'vitesse-dark' })
+const runtime = createMarkdown({ highlighter })
+
+const html = await runtime.renderAsync('```ts\nconst answer = 42\n```', htmlRenderer)
+````
+
+The adapter loads each built-in language when it is first used and caches the result. Missing or unknown language labels are rendered as plain text. The default theme is `vitesse-dark`; token and block colors are emitted as inline styles.
+
+Because the adapter is asynchronous, use `renderAsync()` or `toIRAsync()` with the core API. React and Vue `Markdown` components show plain code while the first highlight is loading, then update to the highlighted IR. During SSR they emit the plain fallback.
+
+Custom asynchronous highlighters should set `isAsync: true` when they are passed to the React or Vue `Markdown` component so it can choose the async rendering path without starting a duplicate highlight request.
+
+### React
+
+```tsx
+import { Markdown } from '@markvia/react'
+import { createShikiHighlighter } from '@markvia/shiki'
+
+const highlighter = await createShikiHighlighter()
+
+export function Article({ source }: { source: string }) {
+  return <Markdown content={source} highlighter={highlighter} />
+}
+```
+
+### Vue
+
+```vue
+<script setup lang="ts">
+import { Markdown } from '@markvia/vue'
+import { createShikiHighlighter } from '@markvia/shiki'
+
+const props = defineProps<{ source: string }>()
+const highlighter = await createShikiHighlighter()
+</script>
+
+<template>
+  <Markdown :content="props.source" :highlighter="highlighter" />
+</template>
+```
 
 ## Synchronous highlighter
 

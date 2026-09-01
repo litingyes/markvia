@@ -1,0 +1,27 @@
+{
+  "name": "@markvia/shiki",
+  "version": "0.1.0",
+  "description": "Shiki code highlighter adapter for Markvia",
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": {
+        "import": "./dist/index.d.mts",
+        "require": "./dist/index.d.cts"
+      },
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "build": "vp pack src/index.ts"
+  },
+  "dependencies": {
+    "@markvia/core": "workspace:*",
+    "shiki": "^4.4.3"
+  }
+}

@@ -51,6 +51,7 @@ export default defineConfig({
         '@markvia/html': sourcePath('../../packages/html/src/index.ts'),
         '@markvia/react': sourcePath('../../packages/react/src/index.tsx'),
         '@markvia/vue': sourcePath('../../packages/vue/src/index.ts'),
+        '@markvia/shiki': sourcePath('../../packages/shiki/src/index.ts'),
       },
     },
   },

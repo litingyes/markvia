@@ -17,7 +17,8 @@
       "@markvia/core": ["./packages/core/src/index.ts"],
       "@markvia/html": ["./packages/html/src/index.ts"],
       "@markvia/react": ["./packages/react/src/index.tsx"],
-      "@markvia/vue": ["./packages/vue/src/index.ts"]
+      "@markvia/vue": ["./packages/vue/src/index.ts"],
+      "@markvia/shiki": ["./packages/shiki/src/index.ts"]
     }
   },
   "include": ["packages/**/*.ts", "packages/**/*.tsx", "examples/**/*.ts", "vite.config.ts"]

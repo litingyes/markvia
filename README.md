@@ -22,6 +22,7 @@ Markvia parses Markdown into a shared Semantic AST and Render IR, then lets HTML
 | `@markvia/html`  | HTML rendering with optional raw HTML compatibility mode          |
 | `@markvia/react` | React renderer and `Markdown` component                           |
 | `@markvia/vue`   | Vue renderer and `Markdown` component                             |
+| `@markvia/shiki` | Optional Shiki adapter with dynamic language loading              |
 
 ## Quick start
 
@@ -71,6 +72,22 @@ defineProps<{ content: string }>()
 </template>
 ```
 
+### Shiki highlighting
+
+```bash
+pnpm add @markvia/core @markvia/html @markvia/shiki
+```
+
+````ts
+import { createMarkdown } from '@markvia/core'
+import { htmlRenderer } from '@markvia/html'
+import { createShikiHighlighter } from '@markvia/shiki'
+
+const highlighter = await createShikiHighlighter()
+const runtime = createMarkdown({ highlighter })
+const html = await runtime.renderAsync('```ts\nconst answer = 42\n```', htmlRenderer)
+````
+
 ### Streaming input
 
 ```ts
@@ -109,7 +126,7 @@ Markvia’s baseline is CommonMark 0.29 plus formal GFM 0.29. `createMarkdown()`
 The following are intentionally outside the current scope:
 
 - GitHub product-layer extensions such as footnotes, Alerts, MDX, frontmatter, issue/PR references, and emoji
-- Shiki, Math, Mermaid, Component Markdown, and CLI
+- Math, Mermaid, Component Markdown, and CLI
 
 ## Documentation
 

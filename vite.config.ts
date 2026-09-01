@@ -10,6 +10,7 @@ export default defineConfig({
       '@markvia/html': workspacePath('./packages/html/src/index.ts'),
       '@markvia/react': workspacePath('./packages/react/src/index.tsx'),
       '@markvia/vue': workspacePath('./packages/vue/src/index.ts'),
+      '@markvia/shiki': workspacePath('./packages/shiki/src/index.ts'),
     },
   },
   fmt: {

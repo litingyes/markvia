@@ -199,7 +199,7 @@ export interface RenderElementNode {
   sourceType: NodeType
   position: SourcePosition
   tag: string
-  props: Record<string, string | number | boolean>
+  props: Record<string, RenderPropValue>
   children: RenderNode[]
 }
 
@@ -219,13 +219,28 @@ export interface RenderDocument {
   children: RenderNode[]
 }
 
+export interface RenderStyle {
+  [property: string]: string | number
+}
+
+export type RenderPropValue = string | number | boolean | RenderStyle
+
 export interface HighlightToken {
   content: string
   className?: string
+  style?: RenderStyle
 }
 
+export interface HighlightResult {
+  tokens: HighlightToken[]
+  blockStyle?: RenderStyle
+}
+
+export type HighlightOutput = HighlightToken[] | HighlightResult
+
 export interface CodeHighlighter {
-  highlight(code: string, language: string | null): HighlightToken[] | Promise<HighlightToken[]>
+  isAsync?: boolean
+  highlight(code: string, language: string | null): HighlightOutput | Promise<HighlightOutput>
 }
 
 export type DocumentTransform = (document: MarkdownDocument) => MarkdownDocument

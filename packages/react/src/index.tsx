@@ -85,6 +85,12 @@ export interface MarkdownProps extends ReactRendererOptions {
   highlighter?: CodeHighlighter
 }
 
+interface AsyncRenderState {
+  document: MarkdownDocument
+  ir?: RenderDocument
+  error?: unknown
+}
+
 function runtimeOptions(props: MarkdownProps) {
   return {
     ...(props.plugins ? { plugins: props.plugins } : {}),
@@ -109,9 +115,14 @@ export function Markdown(props: MarkdownProps): ReactNode {
     () => createMarkdown(runtimeOptions(props)),
     [props.plugins, props.highlighter],
   )
+  const fallbackRuntime = useMemo(
+    () => createMarkdown(props.plugins ? { plugins: props.plugins } : {}),
+    [props.plugins],
+  )
   const [streamDocument, setStreamDocument] = useState<MarkdownDocument | null>(
     () => props.stream?.getDocument() ?? null,
   )
+  const [asyncRender, setAsyncRender] = useState<AsyncRenderState | null>(null)
 
   useEffect(() => {
     if (!props.stream) {
@@ -126,7 +137,51 @@ export function Markdown(props: MarkdownProps): ReactNode {
   const document = props.stream
     ? (streamDocument ?? props.stream.getDocument())
     : (props.document ?? runtime.parse(props.content ?? ''))
-  const ir = useMemo(() => runtime.toIR(document), [document, runtime])
+  const isAsyncHighlighter = props.highlighter?.isAsync === true
+  const fallbackIR = useMemo(
+    () => (isAsyncHighlighter ? fallbackRuntime.toIR(document) : null),
+    [document, fallbackRuntime, isAsyncHighlighter],
+  )
 
-  return createElement(Fragment, null, renderReact(ir, props))
+  useEffect(() => {
+    if (!isAsyncHighlighter) {
+      setAsyncRender(null)
+      return
+    }
+
+    let cancelled = false
+    setAsyncRender({ document })
+    void runtime.toIRAsync(document).then(
+      (ir) => {
+        if (!cancelled) {
+          setAsyncRender({ document, ir })
+        }
+      },
+      (error: unknown) => {
+        if (!cancelled) {
+          setAsyncRender({ document, error })
+        }
+      },
+    )
+
+    return () => {
+      cancelled = true
+    }
+  }, [document, isAsyncHighlighter, runtime])
+
+  const syncIR = useMemo(
+    () => (isAsyncHighlighter ? null : runtime.toIR(document)),
+    [document, isAsyncHighlighter, runtime],
+  )
+
+  if (isAsyncHighlighter) {
+    if (asyncRender?.document === document && 'error' in asyncRender) {
+      throw asyncRender.error
+    }
+
+    const ir = asyncRender?.document === document && asyncRender.ir ? asyncRender.ir : fallbackIR
+    return createElement(Fragment, null, renderReact(ir ?? fallbackRuntime.toIR(document), props))
+  }
+
+  return createElement(Fragment, null, renderReact(syncIR ?? fallbackRuntime.toIR(document), props))
 }

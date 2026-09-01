@@ -47,4 +47,19 @@ describe('@markvia/html', () => {
       ),
     )
   })
+
+  it('serializes style objects from highlighted code safely', () => {
+    const runtime = createMarkdown({
+      highlighter: {
+        highlight: (code) => ({
+          tokens: [{ content: code, style: { color: '#fff', backgroundColor: '#222' } }],
+          blockStyle: { backgroundColor: '#111', color: '#eee' },
+        }),
+      },
+    })
+    const html = runtime.render('```ts\nconst x = 1\n```', htmlRenderer)
+
+    expect(html).toContain('style="background-color:#111;color:#eee"')
+    expect(html).toContain('style="color:#fff;background-color:#222"')
+  })
 })

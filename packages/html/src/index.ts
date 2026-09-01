@@ -1,4 +1,10 @@
-import type { RenderDocument, RenderElementNode, RenderNode, Renderer } from '@markvia/core'
+import type {
+  RenderDocument,
+  RenderElementNode,
+  RenderNode,
+  RenderStyle,
+  Renderer,
+} from '@markvia/core'
 import { escapeHtml } from '@markvia/core'
 
 const voidTags = new Set([
@@ -18,11 +24,24 @@ const voidTags = new Set([
 ])
 const safeTag = /^[a-z][a-z0-9-]*$/
 const safeAttribute = /^[a-zA-Z_:][a-zA-Z0-9_.:-]*$/
+const safeStyleProperty = /^(?:--[a-zA-Z0-9_-]+|[a-zA-Z][a-zA-Z0-9-]*)$/
 const gfmDisallowedHtmlTag =
   /<(?=\/?(?:iframe|noembed|noframes|plaintext|script|style|textarea|title|xmp)(?:[\t\n\f\r />]|$))/gi
 
 export interface HTMLRendererOptions {
   allowRawHtml?: boolean
+}
+
+function renderStyle(style: RenderStyle): string {
+  return Object.entries(style)
+    .filter(([property]) => safeStyleProperty.test(property))
+    .map(([property, value]) => {
+      const cssProperty = property.startsWith('--')
+        ? property
+        : property.replace(/[A-Z]/g, (character) => `-${character.toLowerCase()}`)
+      return `${cssProperty}:${String(value)}`
+    })
+    .join(';')
 }
 
 function renderAttributes(node: RenderElementNode): string {
@@ -32,6 +51,12 @@ function renderAttributes(node: RenderElementNode): string {
     .map(([name, value]) => {
       if (value === true) {
         return ` ${name}`
+      }
+      if (name === 'style' && typeof value === 'object') {
+        return ` ${name}="${escapeHtml(renderStyle(value))}"`
+      }
+      if (typeof value === 'object') {
+        return ''
       }
       return ` ${name}="${escapeHtml(String(value))}"`
     })

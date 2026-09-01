@@ -3,6 +3,8 @@ import type {
   CodeHighlighter,
   CodeNode,
   DocumentNode,
+  HighlightOutput,
+  HighlightToken,
   ImageNode,
   LinkNode,
   ListItemNode,
@@ -10,9 +12,11 @@ import type {
   MarkdownNode,
   RenderDocument,
   RenderElementNode,
+  RenderPropValue,
   RenderNode,
   RenderRawNode,
   RenderTextNode,
+  RenderStyle,
   TableAlignment,
   TableCellNode,
   TableNode,
@@ -63,7 +67,7 @@ function element(
   node: MarkdownNode,
   tag: string,
   children: RenderNode[],
-  props: Record<string, string | number | boolean> = {},
+  props: Record<string, RenderPropValue> = {},
   suffix = '',
 ): RenderElementNode {
   return {
@@ -78,6 +82,13 @@ function element(
     },
     children,
   }
+}
+
+function normalizeHighlight(output: HighlightOutput): {
+  tokens: HighlightToken[]
+  blockStyle?: RenderStyle
+} {
+  return Array.isArray(output) ? { tokens: output } : output
 }
 
 function mapChildren(
@@ -97,25 +108,34 @@ function mapCode(node: CodeNode, options: IROptions): RenderElementNode {
     codeProps['data-incomplete'] = 'true'
   }
 
-  const highlighted = options.highlighter?.highlight(node.value, node.language)
-  if (highlighted && highlighted instanceof Promise) {
+  const highlightedOutput = options.highlighter?.highlight(node.value, node.language)
+  if (highlightedOutput && highlightedOutput instanceof Promise) {
     throw new Error('The configured code highlighter is asynchronous; use renderAsync instead.')
   }
+  const highlighted = highlightedOutput ? normalizeHighlight(highlightedOutput) : null
 
   const codeChildren = highlighted
-    ? highlighted.map((token, index) =>
+    ? highlighted.tokens.map((token, index) =>
         element(
           node,
           'span',
           [textNode(node, token.content, `:token:${index}`)],
-          token.className ? { class: token.className } : {},
+          {
+            ...(token.className ? { class: token.className } : {}),
+            ...(token.style ? { style: token.style } : {}),
+          },
           `:token:${index}`,
         ),
       )
     : [textNode(node, node.value, ':value')]
 
   const code = element(node, 'code', codeChildren, codeProps, ':code')
-  return element(node, 'pre', [code])
+  return element(
+    node,
+    'pre',
+    [code],
+    highlighted?.blockStyle ? { style: highlighted.blockStyle } : {},
+  )
 }
 
 async function mapCodeAsync(node: CodeNode, options: IROptions): Promise<RenderElementNode> {
@@ -127,22 +147,31 @@ async function mapCodeAsync(node: CodeNode, options: IROptions): Promise<RenderE
     codeProps['data-incomplete'] = 'true'
   }
 
-  const highlighted = options.highlighter
+  const highlightedOutput = options.highlighter
     ? await options.highlighter.highlight(node.value, node.language)
     : null
+  const highlighted = highlightedOutput ? normalizeHighlight(highlightedOutput) : null
   const codeChildren = highlighted
-    ? highlighted.map((token, index) =>
+    ? highlighted.tokens.map((token, index) =>
         element(
           node,
           'span',
           [textNode(node, token.content, `:token:${index}`)],
-          token.className ? { class: token.className } : {},
+          {
+            ...(token.className ? { class: token.className } : {}),
+            ...(token.style ? { style: token.style } : {}),
+          },
           `:token:${index}`,
         ),
       )
     : [textNode(node, node.value, ':value')]
 
-  return element(node, 'pre', [element(node, 'code', codeChildren, codeProps, ':code')])
+  return element(
+    node,
+    'pre',
+    [element(node, 'code', codeChildren, codeProps, ':code')],
+    highlighted?.blockStyle ? { style: highlighted.blockStyle } : {},
+  )
 }
 
 function mapListItem(

@@ -105,6 +105,32 @@ describe('@markvia/core', () => {
     }
   })
 
+  it('maps token and block styles into the shared render IR', () => {
+    const runtime = createMarkdown({
+      highlighter: {
+        highlight: (code) => ({
+          tokens: [{ content: code, style: { color: '#fff', fontWeight: 'bold' } }],
+          blockStyle: { backgroundColor: '#111' },
+        }),
+      },
+    })
+    const ir = runtime.toIR(runtime.parse('```ts\nconst x = 1\n```'))
+    const pre = ir.children[0]
+
+    expect(pre?.kind).toBe('element')
+    if (pre?.kind === 'element') {
+      expect(pre.props.style).toEqual({ backgroundColor: '#111' })
+      const code = pre.children[0]
+      expect(code?.kind).toBe('element')
+      if (code?.kind === 'element') {
+        expect(code.children[0]?.kind).toBe('element')
+        if (code.children[0]?.kind === 'element') {
+          expect(code.children[0].props.style).toEqual({ color: '#fff', fontWeight: 'bold' })
+        }
+      }
+    }
+  })
+
   it('keeps block node IDs stable while streaming append-only content', () => {
     const stream = createMarkdown().createStream()
     const updates: number[] = []

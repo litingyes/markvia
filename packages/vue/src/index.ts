@@ -61,6 +61,12 @@ export interface MarkdownProps extends VueRendererOptions {
   highlighter?: CodeHighlighter
 }
 
+interface AsyncRenderState {
+  document: MarkdownDocument
+  ir?: RenderDocument
+  error?: unknown
+}
+
 export const Markdown = defineComponent({
   name: 'MarkviaMarkdown',
   props: {
@@ -85,9 +91,12 @@ export const Markdown = defineComponent({
       ...(props.plugins ? { plugins: props.plugins } : {}),
       ...(props.highlighter ? { highlighter: props.highlighter } : {}),
     })
+    const fallbackRuntime = createMarkdown(props.plugins ? { plugins: props.plugins } : {})
     const currentDocument = ref<MarkdownDocument>(
       props.document ?? runtime.parse(props.content ?? ''),
     )
+    const asyncRender = ref<AsyncRenderState | null>(null)
+    let asyncRequest = 0
     let unsubscribe: (() => void) | undefined
 
     const attachStream = (stream: MarkdownStream | undefined) => {
@@ -118,10 +127,49 @@ export const Markdown = defineComponent({
       },
     )
     watch(() => props.stream, attachStream, { immediate: true })
-    onBeforeUnmount(() => unsubscribe?.())
+    const renderAsyncDocument = (document: MarkdownDocument) => {
+      if (props.highlighter?.isAsync !== true) {
+        asyncRender.value = null
+        return
+      }
+
+      const request = ++asyncRequest
+      asyncRender.value = { document }
+      void runtime.toIRAsync(document).then(
+        (ir) => {
+          if (request === asyncRequest) {
+            asyncRender.value = { document, ir }
+          }
+        },
+        (error: unknown) => {
+          if (request === asyncRequest) {
+            asyncRender.value = { document, error }
+          }
+        },
+      )
+    }
+
+    watch(() => currentDocument.value, renderAsyncDocument, { immediate: true })
+    onBeforeUnmount(() => {
+      asyncRequest += 1
+      unsubscribe?.()
+    })
 
     return () => {
-      const ir = runtime.toIR(currentDocument.value)
+      const document = currentDocument.value
+      if (props.highlighter?.isAsync === true) {
+        if (asyncRender.value?.document === document && 'error' in asyncRender.value) {
+          throw asyncRender.value.error
+        }
+
+        const ir =
+          asyncRender.value?.document === document && asyncRender.value.ir
+            ? asyncRender.value.ir
+            : fallbackRuntime.toIR(document)
+        return renderVue(ir, props.components ? { components: props.components } : {})
+      }
+
+      const ir = runtime.toIR(document)
       return renderVue(ir, props.components ? { components: props.components } : {})
     }
   },

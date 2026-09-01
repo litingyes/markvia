@@ -31,6 +31,18 @@ The main capabilities are:
 
 The standalone `parseMarkdown` and `documentToIR` functions are also exported for lower-level usage.
 
+## `@markvia/shiki`
+
+```ts
+import { createShikiHighlighter } from '@markvia/shiki'
+
+const highlighter = await createShikiHighlighter({ theme: 'vitesse-dark' })
+const runtime = createMarkdown({ highlighter })
+const html = await runtime.renderAsync(source, htmlRenderer)
+```
+
+The adapter dynamically loads and caches built-in languages. Missing or unknown languages use plain text fallback.
+
 ## HTML renderer
 
 ```ts

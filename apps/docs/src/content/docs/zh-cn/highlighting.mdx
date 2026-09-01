@@ -1,9 +1,61 @@
 ---
-title: Code highlighting
-description: 通过 CodeHighlighter hook 为代码块提供同步或异步高亮。
+title: 代码高亮
+description: 通过 CodeHighlighter hook 或内置 Shiki adapter 为代码块提供高亮。
 ---
 
-Markvia 不内置具体的高亮引擎，而是通过 `CodeHighlighter` 接口接入 Shiki、Prism 或其他实现。
+Markvia core 不绑定具体的高亮引擎。可选的 `@markvia/shiki` 包提供一套开箱即用的 Shiki adapter，并支持动态加载语言。
+
+## Shiki adapter
+
+```bash
+pnpm add @markvia/core @markvia/html @markvia/shiki
+```
+
+````ts
+import { createMarkdown } from '@markvia/core'
+import { htmlRenderer } from '@markvia/html'
+import { createShikiHighlighter } from '@markvia/shiki'
+
+const highlighter = await createShikiHighlighter({ theme: 'vitesse-dark' })
+const runtime = createMarkdown({ highlighter })
+
+const html = await runtime.renderAsync('```ts\nconst answer = 42\n```', htmlRenderer)
+````
+
+adapter 会在某种内置语言第一次出现时动态加载并缓存。没有语言标签或语言未知时，会按纯文本渲染。默认主题是 `vitesse-dark`；token 和代码块颜色会以内联 style 输出。
+
+由于 adapter 是异步的，core API 请使用 `renderAsync()` 或 `toIRAsync()`。React 和 Vue 的 `Markdown` 组件会在首次高亮完成前先显示纯文本代码，完成后更新为高亮 IR；SSR 阶段输出纯文本 fallback。
+
+自定义异步 highlighter 传给 React 或 Vue 的 `Markdown` 组件时，也应设置 `isAsync: true`，这样组件可以直接选择异步渲染路径，避免重复发起高亮请求。
+
+### React
+
+```tsx
+import { Markdown } from '@markvia/react'
+import { createShikiHighlighter } from '@markvia/shiki'
+
+const highlighter = await createShikiHighlighter()
+
+export function Article({ source }: { source: string }) {
+  return <Markdown content={source} highlighter={highlighter} />
+}
+```
+
+### Vue
+
+```vue
+<script setup lang="ts">
+import { Markdown } from '@markvia/vue'
+import { createShikiHighlighter } from '@markvia/shiki'
+
+const props = defineProps<{ source: string }>()
+const highlighter = await createShikiHighlighter()
+</script>
+
+<template>
+  <Markdown :content="props.source" :highlighter="highlighter" />
+</template>
+```
 
 ## 同步 highlighter
 
