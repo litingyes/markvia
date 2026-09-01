@@ -1,0 +1,29 @@
+{
+  "name": "@markvia/react",
+  "version": "0.1.0",
+  "description": "React renderer for Markvia",
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": {
+        "import": "./dist/index.d.mts",
+        "require": "./dist/index.d.cts"
+      },
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "build": "vp pack src/index.tsx"
+  },
+  "dependencies": {
+    "@markvia/core": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  }
+}

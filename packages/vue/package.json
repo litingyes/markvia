@@ -1,0 +1,29 @@
+{
+  "name": "@markvia/vue",
+  "version": "0.1.0",
+  "description": "Vue renderer for Markvia",
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": {
+        "import": "./dist/index.d.mts",
+        "require": "./dist/index.d.cts"
+      },
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "build": "vp pack src/index.ts"
+  },
+  "dependencies": {
+    "@markvia/core": "workspace:*"
+  },
+  "peerDependencies": {
+    "vue": ">=3.3"
+  }
+}

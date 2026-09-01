@@ -1,0 +1,29 @@
+{
+  "name": "markvia",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "fmt": "vp fmt",
+    "fmt:check": "vp fmt --check",
+    "lint": "vp lint",
+    "check": "vp check",
+    "test": "vp test",
+    "build": "pnpm -r --if-present run build"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vue/server-renderer": "^3.5.42",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "typescript": "^7.0.2",
+    "vite-plus": "^0.3.0",
+    "vue": "^3.5.42"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "packageManager": "pnpm@11.13.0"
+}

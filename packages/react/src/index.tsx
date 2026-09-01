@@ -1,0 +1,108 @@
+import {
+  Fragment,
+  createElement,
+  useEffect,
+  useMemo,
+  useState,
+  type ElementType,
+  type ReactNode,
+} from 'react'
+import {
+  createMarkdown,
+  type CodeHighlighter,
+  type MarkdownDocument,
+  type MarkdownNode,
+  type MarkdownPlugin,
+  type MarkdownStream,
+  type RenderDocument,
+  type RenderNode,
+  type Renderer,
+} from '@markvia/core'
+
+export type ReactMarkdownComponent = ElementType<Record<string, unknown>>
+
+export interface ReactRendererOptions {
+  components?: Partial<Record<MarkdownNode['type'] | 'document', ReactMarkdownComponent>>
+}
+
+function renderNode(
+  node: RenderNode,
+  components: ReactRendererOptions['components'] = {},
+): ReactNode {
+  if (node.kind === 'text') {
+    return node.value
+  }
+
+  const children = node.children.map((child) => renderNode(child, components))
+  const component = components[node.sourceType]
+  if (component) {
+    return createElement(component, { ...node.props, key: node.id, node }, children)
+  }
+
+  return createElement(node.tag, { ...node.props, key: node.id }, children)
+}
+
+export function renderReact(ir: RenderDocument, options: ReactRendererOptions = {}): ReactNode {
+  return ir.children.map((node) => renderNode(node, options.components))
+}
+
+export function createReactRenderer(options: ReactRendererOptions = {}): Renderer<ReactNode> {
+  return {
+    name: 'react',
+    render: (ir) => renderReact(ir, options),
+  }
+}
+
+export interface MarkdownProps extends ReactRendererOptions {
+  content?: string
+  document?: MarkdownDocument
+  stream?: MarkdownStream
+  plugins?: MarkdownPlugin[]
+  highlighter?: CodeHighlighter
+}
+
+function runtimeOptions(props: MarkdownProps) {
+  return {
+    ...(props.plugins ? { plugins: props.plugins } : {}),
+    ...(props.highlighter ? { highlighter: props.highlighter } : {}),
+  }
+}
+
+function inputCount(props: MarkdownProps): number {
+  return [
+    props.content !== undefined,
+    props.document !== undefined,
+    props.stream !== undefined,
+  ].filter(Boolean).length
+}
+
+export function Markdown(props: MarkdownProps): ReactNode {
+  if (inputCount(props) > 1) {
+    throw new Error('Markdown accepts only one of content, document, or stream.')
+  }
+
+  const runtime = useMemo(
+    () => createMarkdown(runtimeOptions(props)),
+    [props.plugins, props.highlighter],
+  )
+  const [streamDocument, setStreamDocument] = useState<MarkdownDocument | null>(
+    () => props.stream?.getDocument() ?? null,
+  )
+
+  useEffect(() => {
+    if (!props.stream) {
+      setStreamDocument(null)
+      return
+    }
+
+    setStreamDocument(props.stream.getDocument())
+    return props.stream.subscribe((update) => setStreamDocument(update.document))
+  }, [props.stream])
+
+  const document = props.stream
+    ? (streamDocument ?? props.stream.getDocument())
+    : (props.document ?? runtime.parse(props.content ?? ''))
+  const ir = useMemo(() => runtime.toIR(document), [document, runtime])
+
+  return createElement(Fragment, null, renderReact(ir, props))
+}
