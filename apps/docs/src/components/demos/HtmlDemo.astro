@@ -1,0 +1,20 @@
+---
+import { createMarkdown } from '@markvia/core'
+import { htmlRenderer } from '@markvia/html'
+
+interface Props {
+  content: string
+  label?: string
+}
+
+const { content, label = 'HTML renderer' } = Astro.props
+const html = createMarkdown().render(content, htmlRenderer)
+---
+
+<div class="markvia-demo">
+  <div class="markvia-demo__label">{label}</div>
+  <div class="markvia-demo__columns">
+    <div class="markvia-demo__output" set:html={html}></div>
+    <pre class="markvia-demo__source"><code>{html}</code></pre>
+  </div>
+</div>

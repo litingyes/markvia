@@ -1,0 +1,40 @@
+---
+title: Markvia
+description: Universal Markdown Runtime for static, streaming and interactive content.
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components'
+import AstInspector from '../../components/demos/AstInspector.astro'
+import HtmlDemo from '../../components/demos/HtmlDemo.astro'
+import ReactMarkdownDemo from '../../components/demos/ReactMarkdownDemo.tsx'
+import VueMarkdownDemo from '../../components/demos/VueMarkdownDemo.vue'
+import { rendererSampleMarkdown as sampleMarkdown } from '../../components/demos/sampleContent'
+
+# Universal Markdown Runtime
+
+Markvia 将 Markdown 解析为统一的 Semantic AST 和 Render IR，再适配到 HTML、React 和 Vue。
+
+下面的示例使用相同的 Markdown 内容，通过三个 renderer 输出：
+
+<Tabs syncKey="renderer">
+  <TabItem label="HTML">
+    <HtmlDemo content={sampleMarkdown} />
+  </TabItem>
+  <TabItem label="React">
+    <ReactMarkdownDemo client:visible initialContent={sampleMarkdown} />
+  </TabItem>
+  <TabItem label="Vue">
+    <VueMarkdownDemo client:visible initialContent={sampleMarkdown} />
+  </TabItem>
+</Tabs>
+
+<AstInspector content={sampleMarkdown} />
+
+## 设计目标
+
+- 框架无关的 Markdown runtime contract
+- 静态页面、交互组件和流式输入使用同一套 AST / IR
+- 安全的 HTML 输出与稳定的节点 ID
+- 可插拔的 document transform、IR transform 和代码高亮 hook
+
+从 [开始使用](/getting-started/) 了解安装方式，或直接查看 [renderer](/renderers/) 和 [streaming](/streaming/) 示例。

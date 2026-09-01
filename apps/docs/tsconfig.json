@@ -1,0 +1,15 @@
+{
+  "extends": "astro/tsconfigs/strict",
+  "include": [".astro/types.d.ts", "**/*"],
+  "exclude": ["dist"],
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+    "paths": {
+      "@markvia/core": ["../../packages/core/src/index.ts"],
+      "@markvia/html": ["../../packages/html/src/index.ts"],
+      "@markvia/react": ["../../packages/react/src/index.tsx"],
+      "@markvia/vue": ["../../packages/vue/src/index.ts"]
+    }
+  }
+}

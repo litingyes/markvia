@@ -1,0 +1,41 @@
+---
+title: Code highlighting
+description: 通过 CodeHighlighter hook 为代码块提供同步或异步高亮。
+---
+
+Markvia 不内置具体的高亮引擎，而是通过 `CodeHighlighter` 接口接入 Shiki、Prism 或其他实现。
+
+## 同步 highlighter
+
+````ts
+import { createMarkdown } from '@markvia/core'
+
+const runtime = createMarkdown({
+  highlighter: {
+    highlight(code, language) {
+      return [
+        {
+          content: code,
+          className: language ? `language-${language}` : undefined,
+        },
+      ]
+    },
+  },
+})
+
+const html = runtime.render('```ts\nconst answer = 42\n```', htmlRenderer)
+````
+
+## 异步 highlighter
+
+如果高亮器返回 Promise，必须使用异步 IR 或 render 路径：
+
+```ts
+const document = runtime.parse(source)
+const ir = await runtime.toIRAsync(document)
+const output = htmlRenderer.render(ir)
+```
+
+同步调用 `runtime.toIR()` 遇到异步 highlighter 会抛出错误，这是为了避免返回未完成的渲染结果。
+
+文档代码块本身由 Starlight 的代码高亮能力渲染；上面的 API 则展示如何把高亮结果注入 Markvia 的 IR。

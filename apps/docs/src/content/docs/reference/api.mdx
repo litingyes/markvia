@@ -1,0 +1,63 @@
+---
+title: API overview
+description: Markvia core 和各 renderer 的主要入口。
+sidebar:
+  order: 1
+---
+
+## `@markvia/core`
+
+```ts
+import { createMarkdown, parseMarkdown, documentToIR } from '@markvia/core'
+
+const runtime = createMarkdown({
+  plugins: [],
+  highlighter,
+})
+
+const document = runtime.parse(source)
+const ir = runtime.toIR(document)
+const stream = runtime.createStream()
+```
+
+主要能力：
+
+- `parse(source)`：生成 Semantic AST
+- `toIR(document)` / `toIRAsync(document)`：生成 Render IR
+- `render(source, renderer)`：同步渲染
+- `renderAsync(source, renderer)`：异步渲染
+- `createStream()`：创建增量 Markdown stream
+- `use(plugin)`：向现有 runtime 注册插件
+
+## HTML renderer
+
+```ts
+import { htmlRenderer, createHTMLRenderer } from '@markvia/html'
+
+const html = runtime.render(source, htmlRenderer)
+```
+
+## React renderer
+
+```tsx
+import { Markdown, createReactRenderer, renderReact } from '@markvia/react'
+
+const reactNode = renderReact(ir)
+const renderer = createReactRenderer({ components })
+
+function Article() {
+  return <Markdown content={source} />
+}
+```
+
+## Vue renderer
+
+```vue
+<script setup lang="ts">
+import { Markdown } from '@markvia/vue'
+</script>
+
+<template>
+  <Markdown :content="source" />
+</template>
+```

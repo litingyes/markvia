@@ -1,0 +1,91 @@
+:root {
+  --sl-color-accent-low: #d9f7f0;
+  --sl-color-accent: #0f8a78;
+  --sl-color-accent-high: #075246;
+}
+
+[data-theme='dark'] {
+  --sl-color-accent-low: #073b35;
+  --sl-color-accent: #56d8c3;
+  --sl-color-accent-high: #c1fff3;
+}
+
+.markvia-demo {
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 0.75rem;
+  background: var(--sl-color-gray-7);
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+.markvia-demo__label {
+  color: var(--sl-color-gray-2);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+}
+
+.markvia-demo__controls {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.markvia-demo textarea {
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 0.5rem;
+  background: var(--sl-color-black);
+  color: var(--sl-color-white);
+  font: inherit;
+  line-height: 1.5;
+  min-height: 8rem;
+  padding: 0.75rem;
+  resize: vertical;
+  width: 100%;
+}
+
+.markvia-demo__output {
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 0.5rem;
+  background: var(--sl-color-bg);
+  padding: 1rem;
+}
+
+.markvia-demo__source {
+  color: var(--sl-color-gray-3);
+  font-size: 0.85rem;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.markvia-demo__status {
+  color: var(--sl-color-gray-2);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.markvia-demo__status + .markvia-demo__output {
+  margin-top: 0.75rem;
+}
+
+.markvia-demo__columns {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 48rem) {
+  .markvia-demo__columns {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+
+.markvia-demo__columns > * {
+  min-width: 0;
+}
+
+.markvia-demo__tree {
+  max-height: 24rem;
+  overflow: auto;
+}

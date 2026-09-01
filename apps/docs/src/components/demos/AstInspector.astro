@@ -1,0 +1,21 @@
+---
+import { createMarkdown } from '@markvia/core'
+
+interface Props {
+  content: string
+}
+
+const { content } = Astro.props
+const runtime = createMarkdown()
+const document = runtime.parse(content)
+const ir = runtime.toIR(document)
+const snapshot = JSON.stringify({ document, ir }, null, 2)
+---
+
+<div class="markvia-demo">
+  <div class="markvia-demo__label">Semantic AST + Render IR</div>
+  <details>
+    <summary>查看当前 Markdown 的结构化结果</summary>
+    <pre class="markvia-demo__source markvia-demo__tree"><code>{snapshot}</code></pre>
+  </details>
+</div>

@@ -1,0 +1,46 @@
+---
+title: Streaming Markdown
+description: 通过增量输入更新稳定的 Markdown 文档节点。
+---
+
+import { Code, Tabs, TabItem } from '@astrojs/starlight/components'
+import ReactStreamingDemo from '../../components/demos/ReactStreamingDemo.tsx'
+import VueStreamingDemo from '../../components/demos/VueStreamingDemo.vue'
+import streamingExample from '../../../../../examples/streaming.ts?raw'
+
+`createStream()` 接收 Markdown chunks，并通过订阅回调发出文档和变更信息。完整块的节点 ID 会保持稳定，最后一个未完成的 fenced code block 也可以安全展示。
+
+<Tabs syncKey="streaming-framework">
+  <TabItem label="React">
+    <ReactStreamingDemo client:load />
+  </TabItem>
+  <TabItem label="Vue">
+    <VueStreamingDemo client:load />
+  </TabItem>
+</Tabs>
+
+## Core API
+
+```ts
+const stream = runtime.createStream()
+
+stream.subscribe(({ document, changes }) => {
+  console.log(document, changes)
+})
+
+stream.write('# Hello')
+stream.write('\n\nworld')
+stream.finish()
+```
+
+## 完整示例
+
+以下代码直接来自仓库的 `examples/streaming.ts`：
+
+<Code code={streamingExample} lang="ts" title="examples/streaming.ts" />
+
+在 React 或 Vue 中，可以把每次 update 的 `document` 传给对应的 `Markdown` 组件：
+
+```tsx
+<Markdown document={document} />
+```

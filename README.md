@@ -70,4 +70,12 @@ vp lint
 vp check
 ```
 
+文档站基于 Astro 和 Starlight，支持在同一篇文档中展示 HTML、React 和 Vue 示例：
+
+```bash
+pnpm docs:dev
+pnpm docs:build
+pnpm docs:preview
+```
+
 `pnpm build` 会按 workspace 依赖顺序使用各包的 `vp pack` 生成 ESM、CJS、source map 和声明文件。

@@ -9,7 +9,10 @@
     "lint": "vp lint",
     "check": "vp check",
     "test": "vp test",
-    "build": "pnpm -r --if-present run build"
+    "build": "pnpm -r --if-present run build",
+    "docs:dev": "pnpm --filter @markvia/docs dev",
+    "docs:build": "pnpm --filter @markvia/docs build",
+    "docs:preview": "pnpm --filter @markvia/docs preview"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
