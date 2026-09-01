@@ -1,26 +1,26 @@
 ---
-title: 当前限制
-description: Markvia 0.1 的支持范围和暂未承诺的能力。
+title: Limitations
+description: The supported scope and intentionally unsupported capabilities in Markvia 0.1.
 sidebar:
   order: 3
 ---
 
-Markvia 的 Markdown 兼容性基线是 CommonMark 0.29 + 正式 GFM 0.29。`createMarkdown()` 默认启用 GFM，因此同时覆盖 CommonMark 语法；没有单独的严格 CommonMark 模式。
+Markvia’s Markdown compatibility baseline is CommonMark 0.29 plus formal GFM 0.29. `createMarkdown()` enables GFM by default, so CommonMark syntax is covered as well. There is no separate strict CommonMark mode.
 
-已覆盖的格式包括：
+Supported syntax and behavior include:
 
-- CommonMark 的区块、容器、行内语法、引用链接/图片、HTML block、raw HTML、硬换行和 fenced code
-- GFM 表格、表格对齐、任务列表、删除线和扩展自动链接
-- LF、CRLF、CR、tab、Unicode、无尾部换行、非法 marker、危险 URL 和流式分块边界
-- HTML、React SSR、Vue SSR 的统一 IR 输出，以及稳定节点 ID 和块级增量 stream
+- CommonMark blocks, containers, inline syntax, reference links and images, HTML blocks, raw HTML, hard line breaks, and fenced-code metadata
+- GFM tables, table alignment, task lists, strikethrough, and extended autolinks
+- LF, CRLF, and CR line endings; tabs; Unicode; missing final newlines; invalid markers; unsafe URLs; and streaming chunk boundaries
+- A shared IR across HTML, React SSR, and Vue SSR, with stable node IDs and block-level incremental streaming
 
-有意不包含的扩展或能力：
+The following extensions and capabilities are intentionally not included:
 
-- 脚注、Alerts、MDX、frontmatter、issue/PR 引用和 emoji 等 GitHub 产品层扩展
+- GitHub product-layer extensions such as footnotes, Alerts, MDX, frontmatter, issue/PR references, and emoji
 - Shiki
 - Math
 - Mermaid
 - Component Markdown
 - CLI
 
-如果需要扩展语法，优先通过 parser、document transform 或插件边界增加能力，同时保持 HTML、React 和 Vue renderer 共享同一个 IR contract。
+If you need additional syntax, prefer extending the parser, document-transform, or plugin boundary while keeping HTML, React, and Vue on the same IR contract.

@@ -1,6 +1,6 @@
 ---
 title: Renderers
-description: 在 HTML、React 和 Vue 中复用同一个 Markdown runtime。
+description: Reuse the same Markdown runtime across HTML, React, and Vue.
 ---
 
 import { Tabs, TabItem } from '@astrojs/starlight/components'
@@ -9,7 +9,7 @@ import ReactMarkdownDemo from '../../components/demos/ReactMarkdownDemo.tsx'
 import VueMarkdownDemo from '../../components/demos/VueMarkdownDemo.vue'
 import { interactiveSampleMarkdown as sampleMarkdown } from '../../components/demos/sampleContent'
 
-所有 renderer 都消费同一种 `RenderDocument`。因此同一段 Markdown 的语义可以跨输出目标保持一致。
+Every renderer consumes the same `RenderDocument`, so the meaning of a Markdown document stays consistent across output targets.
 
 <Tabs syncKey="renderer">
   <TabItem label="HTML">
@@ -25,7 +25,7 @@ import { interactiveSampleMarkdown as sampleMarkdown } from '../../components/de
 
 ## HTML
 
-HTML renderer 适合静态页面、服务端输出和不需要客户端 runtime 的场景：
+The HTML renderer is suited to static pages, server-rendered output, and applications that do not need a client-side runtime:
 
 ```ts
 import { createMarkdown } from '@markvia/core'
@@ -34,11 +34,11 @@ import { htmlRenderer } from '@markvia/html'
 const html = createMarkdown().render(source, htmlRenderer)
 ```
 
-输出会转义文本，并过滤不安全的 URL 和事件属性。
+Text is escaped, unsafe URLs are rejected, and event attributes are filtered.
 
 ## React
 
-React 包提供 `Markdown` 组件和 `renderReact` 函数：
+The React package provides a `Markdown` component and a `renderReact` function:
 
 ```tsx
 import { Markdown, renderReact } from '@markvia/react'
@@ -46,7 +46,7 @@ import { Markdown, renderReact } from '@markvia/react'
 ;<Markdown content={content} />
 ```
 
-通过 `components` 可以按 Markdown 节点类型替换目标组件：
+Use `components` to replace the target component for specific Markdown node types:
 
 ```tsx
 <Markdown
@@ -60,10 +60,10 @@ import { Markdown, renderReact } from '@markvia/react'
 
 ## Vue
 
-Vue 包提供同名的 `Markdown` 组件：
+The Vue package provides a matching `Markdown` component:
 
 ```vue
 <Markdown :content="content" />
 ```
 
-组件也支持传入 `document` 或 `stream`，因此静态文档和实时输入可以共享 API。
+The component also accepts a `document` or `stream`, so static documents and live input can share the same API.

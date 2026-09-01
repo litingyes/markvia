@@ -13,17 +13,31 @@ export default defineConfig({
     starlight({
       title: 'Markvia',
       description: 'Universal Markdown Runtime for static, streaming and interactive content.',
+      defaultLocale: 'root',
+      locales: {
+        root: {
+          label: 'English',
+          lang: 'en',
+        },
+        'zh-cn': {
+          label: '简体中文',
+          lang: 'zh-CN',
+        },
+      },
       sidebar: [
         {
-          label: '开始使用',
+          label: 'Get started',
+          translations: { 'zh-CN': '开始使用' },
           items: ['index', 'getting-started', 'renderers'],
         },
         {
-          label: '运行时能力',
+          label: 'Runtime capabilities',
+          translations: { 'zh-CN': '运行时能力' },
           items: ['streaming', 'plugins', 'highlighting'],
         },
         {
-          label: '参考',
+          label: 'Reference',
+          translations: { 'zh-CN': '参考' },
           items: [{ autogenerate: { directory: 'reference' } }],
         },
       ],

@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { Markdown } from '@markvia/vue'
+import { demoCopy, type DemoLocale } from './demoCopy'
 
-const props = defineProps<{ initialContent?: string }>()
+const props = withDefaults(defineProps<{ initialContent?: string; locale?: DemoLocale }>(), {
+  locale: 'en',
+})
+const copy = demoCopy[props.locale]
 const content = ref(
   props.initialContent ??
     '# Hello, Markvia\n\nEdit this **Markdown** and the Vue renderer updates it.',
@@ -11,9 +15,9 @@ const content = ref(
 
 <template>
   <div class="markvia-demo">
-    <div class="markvia-demo__label">Vue renderer</div>
+    <div class="markvia-demo__label">{{ copy.vueRenderer }}</div>
     <div class="markvia-demo__controls">
-      <textarea v-model="content" aria-label="Vue Markdown input" />
+      <textarea v-model="content" :aria-label="copy.vueMarkdownInput" />
       <div class="markvia-demo__output">
         <Markdown :content="content" />
       </div>

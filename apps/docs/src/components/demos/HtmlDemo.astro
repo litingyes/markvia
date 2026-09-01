@@ -1,18 +1,21 @@
 ---
 import { createMarkdown } from '@markvia/core'
 import { htmlRenderer } from '@markvia/html'
+import { demoCopy, type DemoLocale } from './demoCopy'
 
 interface Props {
   content: string
   label?: string
+  locale?: DemoLocale
 }
 
-const { content, label = 'HTML renderer' } = Astro.props
+const { content, label, locale = 'en' } = Astro.props
+const copy = demoCopy[locale]
 const html = createMarkdown().render(content, htmlRenderer)
 ---
 
 <div class="markvia-demo">
-  <div class="markvia-demo__label">{label}</div>
+  <div class="markvia-demo__label">{label ?? copy.htmlRenderer}</div>
   <div class="markvia-demo__columns">
     <div class="markvia-demo__output" set:html={html}></div>
     <pre class="markvia-demo__source"><code>{html}</code></pre>

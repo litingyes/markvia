@@ -1,9 +1,9 @@
 ---
 title: Plugins
-description: Extend Markvia with document and IR transforms.
+description: 使用 document transform 和 IR transform 扩展 Markvia。
 ---
 
-Plugins can transform the parsed Semantic AST or the generated Render IR. Multiple plugins run in registration order.
+插件可以在解析后的 Semantic AST 阶段，或生成 Render IR 后进行变换。多个插件按注册顺序执行。
 
 ## Document transform
 
@@ -38,7 +38,7 @@ const addDocumentBadge: MarkdownPlugin = {
 
 ## IR transform
 
-IR transforms are useful for consistently changing tags, attributes, or node structure:
+IR transform 适合统一修改标签、属性或节点结构：
 
 ```ts
 const addClassName: MarkdownPlugin = {
@@ -58,4 +58,4 @@ const addClassName: MarkdownPlugin = {
 const runtime = createMarkdown({ plugins: [addClassName] })
 ```
 
-Plugins should preserve node positions and IDs so editors, incremental updates, and downstream renderers can continue to associate output with the original content.
+插件应保留节点的位置和 ID 信息，这样编辑器、增量更新和下游 renderer 才能继续关联原始内容。

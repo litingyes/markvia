@@ -12,9 +12,9 @@ import { rendererSampleMarkdown as sampleMarkdown } from '../../components/demos
 
 # Universal Markdown Runtime
 
-Markvia 将 Markdown 解析为统一的 Semantic AST 和 Render IR，再适配到 HTML、React 和 Vue。
+Markvia parses Markdown into a shared Semantic AST and Render IR, then adapts the result to HTML, React, and Vue.
 
-下面的示例使用相同的 Markdown 内容，通过三个 renderer 输出：
+The examples below use the same Markdown source with three renderers:
 
 <Tabs syncKey="renderer">
   <TabItem label="HTML">
@@ -30,11 +30,11 @@ Markvia 将 Markdown 解析为统一的 Semantic AST 和 Render IR，再适配�
 
 <AstInspector content={sampleMarkdown} />
 
-## 设计目标
+## Design goals
 
-- 框架无关的 Markdown runtime contract
-- 静态页面、交互组件和流式输入使用同一套 AST / IR
-- 安全的 HTML 输出与稳定的节点 ID
-- 可插拔的 document transform、IR transform 和代码高亮 hook
+- A framework-agnostic Markdown runtime contract
+- One AST/IR pipeline for static pages, interactive components, and streaming input
+- Safe HTML output with stable node IDs
+- Extensible document transforms, IR transforms, and code-highlighting hooks
 
-从 [开始使用](/getting-started/) 了解安装方式，或直接查看 [renderer](/renderers/) 和 [streaming](/streaming/) 示例。
+Read the [Getting Started guide](./getting-started/) to install Markvia, or jump to the [renderer guide](./renderers/) and [streaming guide](./streaming/).

@@ -1,0 +1,40 @@
+---
+title: Markvia
+description: 面向静态、流式和交互式内容的通用 Markdown Runtime。
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components'
+import AstInspector from '../../../components/demos/AstInspector.astro'
+import HtmlDemo from '../../../components/demos/HtmlDemo.astro'
+import ReactMarkdownDemo from '../../../components/demos/ReactMarkdownDemo.tsx'
+import VueMarkdownDemo from '../../../components/demos/VueMarkdownDemo.vue'
+import { rendererSampleMarkdownZh as sampleMarkdown } from '../../../components/demos/sampleContent'
+
+# 通用 Markdown Runtime
+
+Markvia 将 Markdown 解析为统一的 Semantic AST 和 Render IR，然后适配到 HTML、React 和 Vue。
+
+下面的示例使用相同的 Markdown 内容，通过三个 renderer 输出：
+
+<Tabs syncKey="renderer">
+  <TabItem label="HTML">
+    <HtmlDemo content={sampleMarkdown} locale="zh-CN" />
+  </TabItem>
+  <TabItem label="React">
+    <ReactMarkdownDemo client:visible initialContent={sampleMarkdown} locale="zh-CN" />
+  </TabItem>
+  <TabItem label="Vue">
+    <VueMarkdownDemo client:visible initialContent={sampleMarkdown} locale="zh-CN" />
+  </TabItem>
+</Tabs>
+
+<AstInspector content={sampleMarkdown} locale="zh-CN" />
+
+## 设计目标
+
+- 框架无关的 Markdown runtime contract
+- 静态页面、交互组件和流式输入共用一套 AST/IR pipeline
+- 安全的 HTML 输出与稳定的节点 ID
+- 可扩展的 document transform、IR transform 和代码高亮 hook
+
+阅读[开始使用](./getting-started/)了解如何安装 Markvia，或直接查看[renderer 指南](./renderers/)和[streaming 指南](./streaming/)。

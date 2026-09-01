@@ -1,6 +1,6 @@
 ---
 title: Security
-description: Markvia 如何处理 HTML、属性和不安全 URL。
+description: How Markvia handles HTML, attributes, and unsafe URLs.
 sidebar:
   order: 2
 ---
@@ -8,17 +8,17 @@ sidebar:
 import HtmlDemo from '../../../components/demos/HtmlDemo.astro'
 import { unsafeSampleMarkdown as unsafeMarkdown } from '../../../components/demos/sampleContent'
 
-HTML renderer 会：
+The HTML renderer:
 
-- 转义文本内容
-- 默认将 Markdown 中的 raw HTML 当作文本转义
-- 在 raw HTML 兼容模式中保留允许的 tag，同时应用 GFM HTML tag filter
-- 只允许安全的 HTML tag 和 attribute 名称
-- 忽略事件属性，例如 `onclick`
-- 拒绝 `javascript:`、`data:` 等不安全 URL
-- 对不安全链接保留文本，并标记 `data-markvia-unsafe-url="true"`
+- Escapes text content.
+- Treats raw HTML in Markdown as escaped text by default.
+- Preserves raw HTML only when compatibility mode is enabled, while escaping GFM-disallowed tag starters.
+- Allows only safe generated HTML tag and attribute names.
+- Ignores event attributes such as `onclick`.
+- Rejects unsafe URLs such as `javascript:` and `data:`.
+- Keeps the text of an unsafe link and marks it with `data-markvia-unsafe-url="true"`.
 
-兼容模式只对 HTML renderer 开放：
+Compatibility mode is available only for the HTML renderer:
 
 ```ts
 import { createHTMLRenderer } from '@markvia/html'
@@ -27,10 +27,10 @@ const renderer = createHTMLRenderer({ allowRawHtml: true })
 const html = runtime.render(source, renderer)
 ```
 
-React 和 Vue renderer 不提供 raw HTML 放行选项，始终把 raw HTML 作为安全文本输出。即使开启 HTML 兼容模式，也不会放行 GFM tag filter 禁止的 `iframe`、`script`、`style`、`textarea`、`title`、`xmp` 等标签起始符。
+React and Vue do not expose a raw HTML opt-in and always output raw HTML as safe text. Even in HTML compatibility mode, GFM-disallowed `iframe`, `script`, `style`, `textarea`, `title`, and `xmp` tag starters are not passed through.
 
-<HtmlDemo content={unsafeMarkdown} label="安全 HTML 输出" />
+<HtmlDemo content={unsafeMarkdown} label="Safe HTML output" />
 
-## 自定义 renderer
+## Custom renderers
 
-如果应用需要不同的安全策略，应在进入 DOM 或模板系统之前处理 Markvia 输出，并继续保持 URL 验证边界。不要把未验证的用户输入直接作为 Astro 的 `set:html` 内容。
+If an application needs a different security policy, process Markvia output before passing it to the DOM or a template system, while keeping the URL validation boundary intact. Never pass unvalidated user input directly to Astro’s `set:html`.

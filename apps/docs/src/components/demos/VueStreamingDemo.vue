@@ -2,16 +2,16 @@
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { createMarkdown, type MarkdownDocument } from '@markvia/core'
 import { Markdown } from '@markvia/vue'
+import { demoCopy, type DemoLocale } from './demoCopy'
 
-const chunks = [
-  '# Streaming Markdown',
-  '\n\nThe document arrives in small chunks.',
-  '\n\nThe last block can remain incomplete until the stream finishes.',
-]
+const props = withDefaults(defineProps<{ locale?: DemoLocale }>(), {
+  locale: 'en',
+})
+const copy = demoCopy[props.locale]
 
 const runtime = createMarkdown()
 const document = ref<MarkdownDocument>(runtime.parse(''))
-const status = ref('等待流式输入…')
+const status = ref(copy.waitingForStream)
 let timer: ReturnType<typeof setInterval> | undefined
 let unsubscribe: (() => void) | undefined
 
@@ -22,15 +22,15 @@ onMounted(() => {
   document.value = stream.getDocument()
   unsubscribe = stream.subscribe((update) => {
     document.value = update.document
-    status.value = `version ${update.version} · added ${update.changes.added.length} block(s)`
+    status.value = copy.streamUpdate(update.version, update.changes.added.length)
   })
 
   timer = window.setInterval(() => {
-    const chunk = chunks[chunkIndex]
+    const chunk = copy.streamChunks[chunkIndex]
     if (chunk === undefined) {
       if (timer !== undefined) window.clearInterval(timer)
       stream.finish()
-      status.value = 'stream finished'
+      status.value = copy.streamFinished
       return
     }
 
@@ -47,7 +47,7 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="markvia-demo">
-    <div class="markvia-demo__label">Vue streaming</div>
+    <div class="markvia-demo__label">{{ copy.vueStreaming }}</div>
     <p class="markvia-demo__status">{{ status }}</p>
     <div class="markvia-demo__output">
       <Markdown :document="document" />

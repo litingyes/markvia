@@ -1,32 +1,49 @@
 # Markvia
 
-Universal Markdown Runtime for static, streaming and interactive content.
+Universal Markdown runtime for static, streaming, and interactive content.
 
-Markvia 将 Markdown 解析为统一的 Semantic AST 和 Render IR，再适配到 HTML、React 和 Vue。解析基线固定为 CommonMark 0.29 + 正式 GFM 0.29。
+Markvia parses Markdown into a shared Semantic AST and Render IR, then lets HTML, React, and Vue renderers consume the same document model. Parse once, keep node identity stable, and choose the output target that fits your application.
 
-## 当前能力
+## Highlights
 
-- CommonMark 0.29 的区块、容器和行内语法
-- GFM 0.29 的表格、任务列表、删除线和扩展自动链接
-- 引用链接/图片、HTML block、raw HTML、硬换行和 fenced code 元数据
-- 稳定节点 ID 与块级增量 Markdown stream
-- 默认安全的 HTML、React、Vue renderer
-- 可插拔 AST/IR transform 与代码高亮 hook
+- CommonMark 0.29 with formal GFM 0.29 support
+- Tables, task lists, strikethrough, extended autolinks, reference links and images
+- HTML blocks, raw HTML, hard line breaks, and fenced-code metadata
+- Stable node IDs and block-level incremental Markdown streaming
+- Safe HTML, React, and Vue renderers by default
+- Extensible document transforms, IR transforms, and code-highlighting hooks
 - Node.js `>=24`
 
-HTML renderer 可通过 `createHTMLRenderer({ allowRawHtml: true })` 开启兼容模式；默认会转义 raw HTML，React/Vue 始终按文本安全输出。基线不包含脚注、Alerts、MDX、frontmatter、issue/PR 引用或 emoji 等 GitHub 产品层扩展，也暂不包含 Shiki、Math、Mermaid、Component Markdown 或 CLI。
+## Packages
 
-## 使用
+| Package          | Purpose                                                           |
+| ---------------- | ----------------------------------------------------------------- |
+| `@markvia/core`  | Markdown parsing, Semantic AST, Render IR, plugins, and streaming |
+| `@markvia/html`  | HTML rendering with optional raw HTML compatibility mode          |
+| `@markvia/react` | React renderer and `Markdown` component                           |
+| `@markvia/vue`   | Vue renderer and `Markdown` component                             |
+
+## Quick start
+
+### HTML
+
+```bash
+pnpm add @markvia/core @markvia/html
+```
 
 ```ts
 import { createMarkdown } from '@markvia/core'
 import { htmlRenderer } from '@markvia/html'
 
 const runtime = createMarkdown()
-const html = runtime.render('# Hello\n\nMarkvia', htmlRenderer)
+const html = runtime.render('# Hello, Markvia', htmlRenderer)
 ```
 
-React：
+### React
+
+```bash
+pnpm add @markvia/core @markvia/react react
+```
 
 ```tsx
 import { Markdown } from '@markvia/react'
@@ -36,25 +53,75 @@ export function Article({ content }: { content: string }) {
 }
 ```
 
-Vue：
+### Vue
 
-```vue
-<Markdown :content="content" />
+```bash
+pnpm add @markvia/core @markvia/vue vue
 ```
 
-流式输入：
+```vue
+<script setup lang="ts">
+import { Markdown } from '@markvia/vue'
+
+defineProps<{ content: string }>()
+</script>
+
+<template>
+  <Markdown :content="content" />
+</template>
+```
+
+### Streaming input
 
 ```ts
 const stream = runtime.createStream()
+
 stream.subscribe(({ document, changes }) => {
   console.log(document, changes)
 })
+
 stream.write('# Hello')
 stream.write('\n\nworld')
 stream.finish()
 ```
 
-## 开发
+Pass each update’s `document` to the React or Vue `Markdown` component to render live input.
+
+## Security
+
+HTML output escapes text and raw HTML by default, filters event attributes, and rejects unsafe URLs such as `javascript:` and `data:`. Unsafe links retain their text and receive `data-markvia-unsafe-url="true"`.
+
+If compatibility with trusted raw HTML is required, enable it explicitly for the HTML renderer:
+
+```ts
+import { createHTMLRenderer } from '@markvia/html'
+
+const renderer = createHTMLRenderer({ allowRawHtml: true })
+const html = runtime.render(source, renderer)
+```
+
+React and Vue always output raw HTML as safe text. Do not pass unvalidated user input directly to a DOM injection API such as Astro’s `set:html`.
+
+## Compatibility and non-goals
+
+Markvia’s baseline is CommonMark 0.29 plus formal GFM 0.29. `createMarkdown()` enables GFM by default; there is no separate strict CommonMark mode.
+
+The following are intentionally outside the current scope:
+
+- GitHub product-layer extensions such as footnotes, Alerts, MDX, frontmatter, issue/PR references, and emoji
+- Shiki, Math, Mermaid, Component Markdown, and CLI
+
+## Documentation
+
+The documentation site lives in [`apps/docs/`](apps/docs/), is built with Astro and Starlight, and defaults to English. Simplified Chinese is available under the `/zh-cn/` locale when the site is running.
+
+```bash
+pnpm docs:dev
+pnpm docs:build
+pnpm docs:preview
+```
+
+## Development
 
 ```bash
 pnpm install
@@ -63,20 +130,13 @@ pnpm test
 pnpm build
 ```
 
-格式化和静态检查由 Vite+ 提供：
+Formatting and static checks are provided by Vite+:
 
 ```bash
-vp fmt
-vp lint
-vp check
+pnpm fmt:check
+pnpm lint
 ```
 
-文档站基于 Astro 和 Starlight，支持在同一篇文档中展示 HTML、React 和 Vue 示例：
+## License
 
-```bash
-pnpm docs:dev
-pnpm docs:build
-pnpm docs:preview
-```
-
-`pnpm build` 会按 workspace 依赖顺序使用各包的 `vp pack` 生成 ESM、CJS、source map 和声明文件。
+MIT. See [`LICENSE`](LICENSE).

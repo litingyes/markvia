@@ -1,0 +1,69 @@
+---
+title: Renderers
+description: 在 HTML、React 和 Vue 中复用同一个 Markdown runtime。
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components'
+import HtmlDemo from '../../../components/demos/HtmlDemo.astro'
+import ReactMarkdownDemo from '../../../components/demos/ReactMarkdownDemo.tsx'
+import VueMarkdownDemo from '../../../components/demos/VueMarkdownDemo.vue'
+import { interactiveSampleMarkdownZh as sampleMarkdown } from '../../../components/demos/sampleContent'
+
+所有 renderer 都消费同一种 `RenderDocument`，因此同一段 Markdown 的语义可以跨输出目标保持一致。
+
+<Tabs syncKey="renderer">
+  <TabItem label="HTML">
+    <HtmlDemo content={sampleMarkdown} locale="zh-CN" />
+  </TabItem>
+  <TabItem label="React">
+    <ReactMarkdownDemo client:visible initialContent={sampleMarkdown} locale="zh-CN" />
+  </TabItem>
+  <TabItem label="Vue">
+    <VueMarkdownDemo client:visible initialContent={sampleMarkdown} locale="zh-CN" />
+  </TabItem>
+</Tabs>
+
+## HTML
+
+HTML renderer 适合静态页面、服务端渲染输出，以及不需要客户端 runtime 的应用：
+
+```ts
+import { createMarkdown } from '@markvia/core'
+import { htmlRenderer } from '@markvia/html'
+
+const html = createMarkdown().render(source, htmlRenderer)
+```
+
+文本会被转义，不安全的 URL 会被拒绝，事件属性会被过滤。
+
+## React
+
+React 包提供 `Markdown` 组件和 `renderReact` 函数：
+
+```tsx
+import { Markdown, renderReact } from '@markvia/react'
+
+;<Markdown content={content} />
+```
+
+通过 `components` 可以按 Markdown 节点类型替换目标组件：
+
+```tsx
+<Markdown
+  content={content}
+  components={{
+    heading: Heading,
+    link: ExternalLink,
+  }}
+/>
+```
+
+## Vue
+
+Vue 包提供同名的 `Markdown` 组件：
+
+```vue
+<Markdown :content="content" />
+```
+
+组件也支持传入 `document` 或 `stream`，因此静态文档和实时输入可以共享同一套 API。

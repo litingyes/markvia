@@ -1,0 +1,26 @@
+---
+title: 当前限制
+description: Markvia 0.1 的支持范围和暂未包含的能力。
+sidebar:
+  order: 3
+---
+
+Markvia 的 Markdown 兼容性基线是 CommonMark 0.29 加正式 GFM 0.29。`createMarkdown()` 默认启用 GFM，因此同时覆盖 CommonMark 语法；没有单独的严格 CommonMark 模式。
+
+已支持的语法和行为包括：
+
+- CommonMark 的区块、容器、行内语法、引用链接和图片、HTML block、raw HTML、硬换行及 fenced code 元数据
+- GFM 表格、表格对齐、任务列表、删除线和扩展自动链接
+- LF、CRLF 和 CR 换行；tab；Unicode；无尾部换行；非法 marker；不安全 URL；以及流式分块边界
+- HTML、React SSR 和 Vue SSR 共用同一个 IR，并提供稳定节点 ID 和块级增量 stream
+
+有意不包含的扩展或能力包括：
+
+- 脚注、Alerts、MDX、frontmatter、issue/PR 引用和 emoji 等 GitHub 产品层扩展
+- Shiki
+- Math
+- Mermaid
+- Component Markdown
+- CLI
+
+如果需要扩展语法，优先通过 parser、document transform 或插件边界增加能力，同时保持 HTML、React 和 Vue renderer 共用同一个 IR contract。

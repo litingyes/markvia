@@ -1,6 +1,6 @@
 ---
-title: API overview
-description: The main entry points for Markvia core and its renderers.
+title: API 概览
+description: Markvia core 和各 renderer 的主要入口。
 sidebar:
   order: 1
 ---
@@ -20,16 +20,16 @@ const ir = runtime.toIR(document)
 const stream = runtime.createStream()
 ```
 
-The main capabilities are:
+主要能力包括：
 
-- `parse(source)`: produce a Semantic AST
-- `toIR(document)` / `toIRAsync(document)`: produce Render IR
-- `render(source, renderer)`: render synchronously
-- `renderAsync(source, renderer)`: render asynchronously
-- `createStream()`: create an incremental Markdown stream
-- `use(plugin)`: register a plugin on an existing runtime
+- `parse(source)`：生成 Semantic AST
+- `toIR(document)` / `toIRAsync(document)`：生成 Render IR
+- `render(source, renderer)`：同步渲染
+- `renderAsync(source, renderer)`：异步渲染
+- `createStream()`：创建增量 Markdown stream
+- `use(plugin)`：向现有 runtime 注册插件
 
-The standalone `parseMarkdown` and `documentToIR` functions are also exported for lower-level usage.
+此外，`parseMarkdown` 和 `documentToIR` 也会导出，适合更底层的使用场景。
 
 ## HTML renderer
 
@@ -40,7 +40,7 @@ const html = runtime.render(source, htmlRenderer)
 const compatibleHtml = runtime.render(source, createHTMLRenderer({ allowRawHtml: true }))
 ```
 
-`htmlRenderer` escapes raw HTML by default. `allowRawHtml` is an HTML-renderer compatibility option; React and Vue always output raw HTML as safe text.
+`htmlRenderer` 默认转义 raw HTML。`allowRawHtml` 仅是 HTML renderer 的兼容选项；React 和 Vue 始终将 raw HTML 作为安全文本输出。
 
 ## React renderer
 

@@ -1,16 +1,16 @@
 import { useEffect, useState } from 'react'
 import { createMarkdown, type MarkdownDocument } from '@markvia/core'
 import { Markdown } from '@markvia/react'
+import { demoCopy, type DemoLocale } from './demoCopy'
 
-const chunks = [
-  '# Streaming Markdown',
-  '\n\nThe document arrives in small chunks.',
-  '\n\nThe last block can remain incomplete until the stream finishes.',
-]
+interface Props {
+  locale?: DemoLocale
+}
 
-export default function ReactStreamingDemo() {
+export default function ReactStreamingDemo({ locale = 'en' }: Props) {
   const [document, setDocument] = useState<MarkdownDocument>(() => createMarkdown().parse(''))
-  const [status, setStatus] = useState('等待流式输入…')
+  const copy = demoCopy[locale]
+  const [status, setStatus] = useState(copy.waitingForStream)
 
   useEffect(() => {
     const stream = createMarkdown().createStream()
@@ -19,15 +19,15 @@ export default function ReactStreamingDemo() {
     setDocument(stream.getDocument())
     const unsubscribe = stream.subscribe((update) => {
       setDocument(update.document)
-      setStatus(`version ${update.version} · added ${update.changes.added.length} block(s)`)
+      setStatus(copy.streamUpdate(update.version, update.changes.added.length))
     })
 
     const timer = window.setInterval(() => {
-      const chunk = chunks[chunkIndex]
+      const chunk = copy.streamChunks[chunkIndex]
       if (chunk === undefined) {
         window.clearInterval(timer)
         stream.finish()
-        setStatus('stream finished')
+        setStatus(copy.streamFinished)
         return
       }
 
@@ -43,7 +43,7 @@ export default function ReactStreamingDemo() {
 
   return (
     <div className="markvia-demo">
-      <div className="markvia-demo__label">React streaming</div>
+      <div className="markvia-demo__label">{copy.reactStreaming}</div>
       <p className="markvia-demo__status">{status}</p>
       <div className="markvia-demo__output">
         <Markdown document={document} />

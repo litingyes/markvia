@@ -1,0 +1,44 @@
+---
+title: 开始使用
+description: 安装 Markvia 并渲染第一份 Markdown 文档。
+---
+
+import { Code, Steps } from '@astrojs/starlight/components'
+import basicExample from '../../../../../../examples/basic.ts?raw'
+
+Markvia 要求 Node.js `>=24`。下面的包管理器示例使用 pnpm。
+
+<Steps>
+
+1. 安装 runtime 和一个 renderer：
+
+   ```bash
+   pnpm add @markvia/core @markvia/html
+   ```
+
+2. 创建 runtime 并选择 renderer：
+
+   ```ts
+   import { createMarkdown } from '@markvia/core'
+   import { htmlRenderer } from '@markvia/html'
+
+   const runtime = createMarkdown()
+   const html = runtime.render('# Hello', htmlRenderer)
+   ```
+
+3. 运行项目的类型检查和测试：
+
+   ```bash
+   pnpm check
+   pnpm test
+   ```
+
+</Steps>
+
+## 完整示例
+
+下面的代码直接从仓库中的 `examples/basic.ts` 加载：
+
+<Code code={basicExample} lang="ts" title="examples/basic.ts" />
+
+`createMarkdown()` 负责解析 Markdown 并生成 Render IR；renderer 只负责将 IR 映射为目标输出。
