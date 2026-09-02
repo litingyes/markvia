@@ -60,6 +60,7 @@ async function main(): Promise<void> {
       const version = operation.state.newVersion
       run('pnpm', ['exec', 'changelogen', '--output', 'CHANGELOG.md', '-r', version])
       addReleaseDate(version)
+      run('pnpm', ['fmt', 'CHANGELOG.md'])
     },
   })
 }
