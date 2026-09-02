@@ -39,6 +39,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Sync Astro types
+        run: pnpm --filter @markvia/docs exec astro sync
+
       - name: Check formatting
         run: pnpm fmt:check
 
