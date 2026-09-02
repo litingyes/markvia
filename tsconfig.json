@@ -21,5 +21,11 @@
       "@markvia/shiki": ["./packages/shiki/src/index.ts"]
     }
   },
-  "include": ["packages/**/*.ts", "packages/**/*.tsx", "examples/**/*.ts", "vite.config.ts"]
+  "include": [
+    "packages/**/*.ts",
+    "packages/**/*.tsx",
+    "examples/**/*.ts",
+    "scripts/**/*.ts",
+    "vite.config.ts"
+  ]
 }

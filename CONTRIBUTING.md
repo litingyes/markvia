@@ -12,13 +12,13 @@ git switch -c feat/your-feature
 
 ## Submitting a Code PR
 
-Changes that affect a public package's API, functionality, or behavior require a changeset:
+Use Conventional Commits for changes that affect the project:
 
 ```bash
-pnpm changeset
+git commit -m "feat(core): describe the change"
 ```
 
-Select the public packages that are actually affected and choose the appropriate bump type. All five public packages are versioned together. Changesets are not required for documentation-only, test-only, or CI-only changes.
+Release notes are generated from the commit history. All five public packages are versioned together, so changesets are not required.
 
 Run the following checks before committing:
 
@@ -33,25 +33,31 @@ pnpm docs:build
 ```
 
 ```bash
-git add packages .changeset
+git add .
 git commit -m "feat(core): describe the change"
 git push -u origin feat/your-feature
 ```
 
-Set `release` as the base branch for the Pull Request. After the code PR is merged, GitHub Actions automatically creates or updates the `chore(release): version packages` Release PR.
+Set `release` as the base branch for the Pull Request. After the code PR is merged, maintainers can create a release from the updated `release` branch.
 
 ## Releasing a Version
 
-After reviewing the version numbers and changelogs in the Release PR, maintainers should merge it using Squash and merge. The Release workflow then automatically:
+From a clean `release` branch, run:
+
+```bash
+pnpm release
+```
+
+The script runs the quality checks, interactively selects the next version, updates the root package and all five public packages, generates `CHANGELOG.md`, commits the release, creates a `vX.Y.Z` tag, and pushes both the commit and tag. The tag-triggered Release workflow then:
 
 1. Runs the quality checks again.
 2. Publishes all five public packages to npm using npm Trusted Publishing.
-3. Creates Git tags and a GitHub Release.
+3. Creates or updates the matching GitHub Release from `CHANGELOG.md`.
 
-Do not manually edit package versions or changelogs, or run `npm publish` locally.
+Do not manually edit package versions or changelogs, or publish packages locally.
 
-If a temporary error occurs during publishing, re-run the original workflow in GitHub Actions. If a code fix is required, apply the fix first, then use the manual retry option in the Release workflow and confirm the publish.
+If a temporary error occurs during publishing, re-run the tag workflow after resolving the cause. If a code fix is required, apply the fix before creating a new release tag.
 
 ## First Release
 
-npm Trusted Publishers can only be configured for packages that already exist on npm. For the first release, maintainers must manually publish the selected version once using an npm account with 2FA enabled. Once all five packages exist, immediately configure Trusted Publishing for each package; all subsequent releases use the automated workflow.
+npm Trusted Publishers can only be configured for packages that already exist on npm. For the first release, maintainers must manually publish the selected version once using an npm account with 2FA enabled. Once all five packages exist, configure Trusted Publishing for each package against `.github/workflows/release.yml` and the `npm-release` environment; subsequent releases use `pnpm release` and the automated workflow.

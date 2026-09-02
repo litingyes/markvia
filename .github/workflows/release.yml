@@ -2,15 +2,8 @@ name: Release
 
 on:
   push:
-    branches:
-      - release
-  workflow_dispatch:
-    inputs:
-      confirm:
-        description: Confirm a manual retry of the npm publish job
-        required: true
-        default: false
-        type: boolean
+    tags:
+      - 'v*'
 
 concurrency:
   group: release-${{ github.ref }}
@@ -25,78 +18,9 @@ jobs:
     permissions:
       contents: read
 
-  mode:
-    name: Select release mode
-    needs: quality
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    outputs:
-      mode: ${{ steps.select.outputs.mode }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 11.13.0
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version-file: .node-version
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Select Changesets mode
-        id: select
-        uses: changesets/action/select-mode@v2
-
-  version:
-    name: Create or update Release PR
-    needs: mode
-    if: needs.mode.outputs.mode == 'version'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 11.13.0
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version-file: .node-version
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Version packages and create Release PR
-        uses: changesets/action/version@v2
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: pnpm version-packages
-          commit-message: 'chore(release): version packages'
-          pr-title: 'chore(release): version packages'
-          pr-base-branch: release
-
   publish:
     name: Publish packages
-    needs: mode
-    if: >-
-      needs.mode.outputs.mode == 'publish' &&
-      (
-        (github.event_name == 'push' && contains(github.event.head_commit.message, 'chore(release): version packages')) ||
-        (github.event_name == 'workflow_dispatch' && inputs.confirm == true)
-      )
+    needs: quality
     runs-on: ubuntu-latest
     environment:
       name: npm-release
@@ -106,6 +30,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -122,10 +48,13 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Publish packages and create GitHub Release
-        uses: changesets/action/publish@v2
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: pnpm release
-          create-github-releases: true
-          push-git-tags: true
+      - name: Build packages
+        run: pnpm build
+
+      - name: Publish packages
+        run: pnpm publish -r --access public --no-git-checks
+
+      - name: Create GitHub Release
+        run: pnpm exec changelogen gh release "$GITHUB_REF_NAME"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
