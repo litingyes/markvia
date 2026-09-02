@@ -1,6 +1,6 @@
 {
   "name": "@markvia/core",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Framework-agnostic Markdown runtime core",
   "bugs": {
     "url": "https://github.com/litingyes/markvia/issues"
