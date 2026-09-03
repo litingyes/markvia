@@ -64,7 +64,7 @@ class SourceLocator {
 
     while (low <= high) {
       const middle = Math.floor((low + high) / 2)
-      const start = this.lineStarts[middle] ?? 0
+      const start = this.lineStarts[middle]!
 
       if (start <= offset) {
         low = middle + 1
@@ -74,7 +74,7 @@ class SourceLocator {
     }
 
     const lineIndex = Math.max(0, high)
-    const lineStart = this.lineStarts[lineIndex] ?? 0
+    const lineStart = this.lineStarts[lineIndex]!
 
     return {
       offset,
@@ -157,15 +157,15 @@ function collectDefinitions(node: Content, definitions: Map<string, Definition>)
 
 function isIncompleteFence(source: string, range: { start: number; end: number }): boolean {
   const raw = source.slice(range.start, range.end)
-  const firstLine = raw.match(/^[^\r\n]*/)?.[0] ?? ''
+  const firstLine = raw.split(/\r\n|\r|\n/)[0]!
   const opening = firstLine.match(/^ {0,3}(`{3,}|~{3,})/)
 
   if (!opening) {
     return false
   }
 
-  const marker = opening[1]?.[0] ?? '`'
-  const length = opening[1]?.length ?? 3
+  const marker = opening[1]![0]!
+  const length = opening[1]!.length
   const closing = new RegExp(`^ {0,3}${marker}{${length},}[ \\t]*$`)
   const lines = raw.split(/\r\n|\r|\n/)
 

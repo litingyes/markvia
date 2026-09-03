@@ -3,6 +3,8 @@ import { createMarkdown } from '@markvia/core'
 import { markdownFixtures } from '../../core/test/markdown-fixtures'
 import { canonicalHtml } from '../../core/test/markdown-test-utils'
 import { createHTMLRenderer, htmlRenderer } from './index'
+import { renderHTML } from './index'
+import type { RenderDocument, RenderNode } from '@markvia/core'
 
 function withoutNodeIds(value: string): string {
   return value.replace(/ data-markvia-node-id="[^"]*"/g, '')
@@ -61,5 +63,101 @@ describe('@markvia/html', () => {
 
     expect(html).toContain('style="background-color:#111;color:#eee"')
     expect(html).toContain('style="color:#fff;background-color:#222"')
+  })
+
+  it('filters unsafe attributes and serializes every supported attribute shape', () => {
+    const document = {
+      kind: 'root',
+      id: 'root',
+      children: [
+        {
+          kind: 'element',
+          id: 'element',
+          sourceType: 'paragraph',
+          position: {
+            start: { offset: 0, line: 1, column: 1 },
+            end: { offset: 1, line: 1, column: 2 },
+          },
+          tag: 'div',
+          props: {
+            hidden: true,
+            disabled: false,
+            title: null,
+            'data-label': 'a&"',
+            onclick: 'alert(1)',
+            'bad name': 'ignored',
+            style: {
+              backgroundColor: '#111',
+              '--custom-color': 'red',
+              'bad property': 'ignored',
+            },
+            payload: { ignored: 'object' },
+          },
+          children: [],
+        },
+      ],
+    } as unknown as RenderDocument
+
+    const html = renderHTML(document)
+
+    expect(html).toBe(
+      '<div hidden data-label="a&amp;&quot;" style="background-color:#111;--custom-color:red"></div>',
+    )
+    expect(html).not.toContain('onclick')
+    expect(html).not.toContain('bad name')
+    expect(html).not.toContain('payload')
+  })
+
+  it('handles raw HTML, void tags, and unsafe element names', () => {
+    const raw = {
+      kind: 'raw',
+      id: 'raw',
+      sourceType: 'html',
+      position: {
+        start: { offset: 0, line: 1, column: 1 },
+        end: { offset: 1, line: 1, column: 2 },
+      },
+      value: '<script>x</script><iframe>x</iframe><strong>ok</strong>',
+    } as unknown as RenderNode
+    const document = {
+      kind: 'root',
+      id: 'root',
+      children: [
+        raw,
+        {
+          kind: 'element',
+          id: 'img',
+          sourceType: 'image',
+          position: raw.position,
+          tag: 'img',
+          props: { alt: 'image' },
+          children: [],
+        },
+        {
+          kind: 'element',
+          id: 'unsafe-tag',
+          sourceType: 'html',
+          position: raw.position,
+          tag: 'bad.tag',
+          props: {},
+          children: [
+            {
+              kind: 'text',
+              id: 'child',
+              sourceType: 'text',
+              position: raw.position,
+              value: '<safe>',
+            },
+          ],
+        },
+      ],
+    } as unknown as RenderDocument
+
+    expect(renderHTML(document)).toContain('&lt;script&gt;')
+    expect(renderHTML(document, { allowRawHtml: true })).toContain(
+      '&lt;script>x&lt;/script>&lt;iframe>x&lt;/iframe><strong>ok</strong>',
+    )
+    expect(renderHTML(document)).toContain('<img alt="image">')
+    expect(renderHTML(document)).toContain('&lt;safe&gt;')
   })
 })

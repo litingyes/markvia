@@ -24,7 +24,7 @@ function firstText(node: MarkdownNode): string {
 
 function signature(node: MarkdownNode): string {
   const content = firstText(node).trim().toLowerCase()
-  const anchor = content.split(/\s+/)[0] ?? ''
+  const anchor = content.split(/\s+/)[0]!
 
   switch (node.type) {
     case 'heading':
@@ -84,15 +84,12 @@ function childMatches(oldChildren: MarkdownNode[], newChildren: MarkdownNode[]):
   let oldCursor = 0
 
   for (let newIndex = 0; newIndex < newChildren.length; newIndex += 1) {
-    const next = newChildren[newIndex]
-    if (!next) {
-      continue
-    }
+    const next = newChildren[newIndex]!
 
     let matchIndex = -1
     for (let oldIndex = oldCursor; oldIndex < oldChildren.length; oldIndex += 1) {
-      const previous = oldChildren[oldIndex]
-      if (previous && sameKind(previous, next) && signature(previous) === signature(next)) {
+      const previous = oldChildren[oldIndex]!
+      if (sameKind(previous, next) && signature(previous) === signature(next)) {
         matchIndex = oldIndex
         break
       }
@@ -115,10 +112,6 @@ function childMatches(oldChildren: MarkdownNode[], newChildren: MarkdownNode[]):
 }
 
 function reconcileNode(oldNode: MarkdownNode, newNode: MarkdownNode): MarkdownNode {
-  if (!sameKind(oldNode, newNode)) {
-    return newNode
-  }
-
   if (!('children' in oldNode) || !('children' in newNode)) {
     return { ...newNode, id: oldNode.id } as MarkdownNode
   }

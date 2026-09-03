@@ -51,8 +51,8 @@ jobs:
       - name: Type check
         run: pnpm check
 
-      - name: Test
-        run: pnpm test -- --run
+      - name: Test with coverage
+        run: pnpm test:coverage -- --run
 
       - name: Build packages
         run: pnpm build

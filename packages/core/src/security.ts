@@ -20,7 +20,7 @@ export function escapeHtml(value: string): string {
 export function isSafeUrl(value: string): boolean {
   let url = ''
   for (const character of value.trim()) {
-    const code = character.codePointAt(0) ?? 0
+    const code = character.codePointAt(0) as number
     if (code <= 0x1f || (code >= 0x7f && code <= 0x9f)) {
       continue
     }

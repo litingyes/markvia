@@ -53,13 +53,13 @@ function textNode(node: MarkdownNode, value: string, suffix = ''): RenderTextNod
   }
 }
 
-function rawNode(node: MarkdownNode): RenderRawNode {
+function rawNode(node: Extract<MarkdownNode, { type: 'html' }>): RenderRawNode {
   return {
     kind: 'raw',
     id: node.id,
     sourceType: 'html',
     position: node.position,
-    value: node.type === 'html' ? node.value : '',
+    value: node.value,
   }
 }
 

@@ -134,9 +134,10 @@ export function Markdown(props: MarkdownProps): ReactNode {
     return props.stream.subscribe((update) => setStreamDocument(update.document))
   }, [props.stream])
 
+  const parsedDocument = useMemo(() => runtime.parse(props.content ?? ''), [runtime, props.content])
   const document = props.stream
     ? (streamDocument ?? props.stream.getDocument())
-    : (props.document ?? runtime.parse(props.content ?? ''))
+    : (props.document ?? parsedDocument)
   const isAsyncHighlighter = props.highlighter?.isAsync === true
   const fallbackIR = useMemo(
     () => (isAsyncHighlighter ? fallbackRuntime.toIR(document) : null),
@@ -180,8 +181,8 @@ export function Markdown(props: MarkdownProps): ReactNode {
     }
 
     const ir = asyncRender?.document === document && asyncRender.ir ? asyncRender.ir : fallbackIR
-    return createElement(Fragment, null, renderReact(ir ?? fallbackRuntime.toIR(document), props))
+    return createElement(Fragment, null, renderReact(ir!, props))
   }
 
-  return createElement(Fragment, null, renderReact(syncIR ?? fallbackRuntime.toIR(document), props))
+  return createElement(Fragment, null, renderReact(syncIR!, props))
 }
