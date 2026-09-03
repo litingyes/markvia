@@ -1,0 +1,20 @@
+---
+title: Playground
+description: 编辑 Markdown，比较 HTML、React 和 Vue 输出，并查看共享的 AST 与 Render IR。
+template: splash
+prev: false
+next: false
+sidebar:
+  order: -1
+---
+
+import MarkdownPlayground from '../../../components/playground/MarkdownPlayground.tsx'
+
+<MarkdownPlayground client:load locale="zh-CN" />
+
+## 可以尝试什么
+
+- 在 HTML、React 和 Vue renderer 之间切换。
+- 打开 HTML 面板查看安全的生成标记。
+- 打开 AST / IR 面板了解 Markvia 如何表示文档。
+- 使用分享按钮复制包含当前 Markdown 和视图设置的链接。

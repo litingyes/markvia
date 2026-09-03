@@ -1,40 +1,51 @@
 ---
 title: Markvia
 description: Universal Markdown Runtime for static, streaming and interactive content.
+template: splash
+prev: false
+next: false
+hero:
+  title: Write once. Render everywhere.
+  tagline: A universal Markdown runtime for static pages, streaming input, and interactive content.
+  actions:
+    - text: Open Playground
+      link: /playground/
+      variant: primary
+    - text: Get started
+      link: /getting-started/
+      variant: secondary
 ---
 
-import { Tabs, TabItem } from '@astrojs/starlight/components'
-import AstInspector from '../../components/demos/AstInspector.astro'
+import { Card, CardGrid } from '@astrojs/starlight/components'
 import HtmlDemo from '../../components/demos/HtmlDemo.astro'
-import ReactMarkdownDemo from '../../components/demos/ReactMarkdownDemo.tsx'
-import VueMarkdownDemo from '../../components/demos/VueMarkdownDemo.vue'
 import { rendererSampleMarkdown as sampleMarkdown } from '../../components/demos/sampleContent'
 
-# Universal Markdown Runtime
+<div class="markvia-landing__intro">
 
-Markvia parses Markdown into a shared Semantic AST and Render IR, then adapts the result to HTML, React, and Vue.
+Markvia parses Markdown into a shared Semantic AST and Render IR, then adapts the same document to HTML, React, and Vue.
 
-The examples below use the same Markdown source with three renderers:
+</div>
 
-<Tabs syncKey="renderer">
-  <TabItem label="HTML">
-    <HtmlDemo content={sampleMarkdown} />
-  </TabItem>
-  <TabItem label="React">
-    <ReactMarkdownDemo client:visible initialContent={sampleMarkdown} />
-  </TabItem>
-  <TabItem label="Vue">
-    <VueMarkdownDemo client:visible initialContent={sampleMarkdown} />
-  </TabItem>
-</Tabs>
+## One source, multiple targets
 
-<AstInspector content={sampleMarkdown} />
+The lightweight preview below uses the same safe HTML renderer that powers static output. Use the Playground to edit the source and compare every target interactively.
 
-## Design goals
+<HtmlDemo content={sampleMarkdown} />
 
-- A framework-agnostic Markdown runtime contract
-- One AST/IR pipeline for static pages, interactive components, and streaming input
-- Safe HTML output with stable node IDs
-- Extensible document transforms, IR transforms, and code-highlighting hooks
+<CardGrid>
+  <Card title="One semantic pipeline" icon="document">
+    Parse once, keep stable node identity, and let each renderer consume the same Render IR.
+  </Card>
+  <Card title="Safe by default" icon="padlock">
+    Text is escaped, unsafe URLs are rejected, and raw HTML stays inert unless a trusted HTML
+    renderer opts in.
+  </Card>
+  <Card title="Built for change" icon="rocket">
+    Stream incremental Markdown, transform documents, and add code-highlighting hooks without
+    changing renderer contracts.
+  </Card>
+</CardGrid>
 
-Read the [Getting Started guide](./getting-started/) to install Markvia, or jump to the [renderer guide](./renderers/) and [streaming guide](./streaming/).
+## Explore the runtime
+
+Start with the [Getting Started guide](./getting-started/), inspect [renderer integration](./renderers/), or experiment with your own content in the [Playground](./playground/).

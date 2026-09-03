@@ -89,3 +89,403 @@
   max-height: 24rem;
   overflow: auto;
 }
+
+.markvia-landing__intro {
+  max-width: 48rem;
+  margin: 0 auto 2.5rem;
+  color: var(--sl-color-gray-2);
+  font-size: clamp(1.05rem, 0.92rem + 0.5vw, 1.3rem);
+  line-height: 1.7;
+  text-align: center;
+}
+
+[data-has-hero] .sl-markdown-content > h2 {
+  margin-top: 3.5rem;
+}
+
+[data-has-hero] .sl-markdown-content .markvia-demo {
+  margin-inline: auto;
+  max-width: 64rem;
+}
+
+.markvia-playground {
+  --markvia-panel-bg: var(--sl-color-bg);
+  --markvia-panel-border: var(--sl-color-gray-5);
+  margin-inline: auto;
+  max-width: 78rem;
+}
+
+.markvia-playground__intro {
+  max-width: 52rem;
+  margin: 0 auto 2rem;
+  text-align: center;
+}
+
+.markvia-playground__intro h2 {
+  margin: 0;
+  color: var(--sl-color-white);
+  font-size: clamp(1.75rem, 1.2rem + 2vw, 3rem);
+  letter-spacing: -0.035em;
+}
+
+.markvia-playground__intro > p:last-child {
+  margin: 0.9rem auto 0;
+  max-width: 48rem;
+  color: var(--sl-color-gray-2);
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
+
+.markvia-playground__eyebrow {
+  margin: 0 0 0.75rem;
+  color: var(--sl-color-text-accent);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.markvia-playground__workspace {
+  overflow: hidden;
+  border: 1px solid var(--markvia-panel-border);
+  border-radius: 0.8rem;
+  background: var(--markvia-panel-bg);
+  box-shadow: 0 1.5rem 4rem color-mix(in srgb, var(--sl-color-black) 32%, transparent);
+}
+
+.markvia-playground__toolbar,
+.markvia-playground__inspect-heading,
+.markvia-playground__section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.markvia-playground__toolbar {
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--markvia-panel-border);
+  background: var(--sl-color-gray-7);
+  padding: 0.75rem 1rem;
+}
+
+.markvia-playground__select {
+  display: grid;
+  gap: 0.35rem;
+  min-width: min(100%, 15rem);
+  color: var(--sl-color-gray-2);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.markvia-playground select,
+.markvia-playground textarea,
+.markvia-playground button {
+  font: inherit;
+}
+
+.markvia-playground select,
+.markvia-playground textarea {
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 0.55rem;
+  background: var(--sl-color-black);
+  color: var(--sl-color-white);
+}
+
+.markvia-playground select {
+  min-height: 2.25rem;
+  padding: 0.45rem 0.7rem;
+  text-transform: none;
+}
+
+.markvia-playground__toolbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.25rem;
+  margin-left: auto;
+  margin-block: 0;
+  padding-left: 0.75rem;
+  border-left: 1px solid var(--sl-color-gray-5);
+}
+
+.markvia-playground button {
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 0.45rem;
+  background: transparent;
+  color: var(--sl-color-white);
+  cursor: pointer;
+  padding: 0.5rem 0.8rem;
+  transition:
+    border-color 160ms ease,
+    color 160ms ease,
+    background 160ms ease;
+}
+
+.markvia-playground button:hover,
+.markvia-playground button[aria-selected='true'],
+.markvia-playground button[aria-pressed='true'] {
+  border-color: var(--sl-color-text-accent);
+  color: var(--sl-color-white);
+}
+
+.markvia-playground button:focus-visible,
+.markvia-playground select:focus-visible,
+.markvia-playground textarea:focus-visible {
+  outline: 2px solid var(--sl-color-text-accent);
+  outline-offset: 2px;
+}
+
+.markvia-playground__primary-action {
+  border-color: var(--sl-color-text-accent) !important;
+  background: var(--sl-color-text-accent) !important;
+  color: var(--sl-color-black) !important;
+  font-weight: 700;
+}
+
+.markvia-playground button.markvia-playground__toolbar-button {
+  min-height: 2.25rem;
+  padding: 0.45rem 0.7rem;
+  font-size: 0.82rem;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.markvia-playground__quiet-action {
+  border-color: transparent !important;
+  color: var(--sl-color-gray-2) !important;
+}
+
+.markvia-playground__quiet-action:hover {
+  background: var(--sl-color-gray-6) !important;
+}
+
+.markvia-playground__secondary-action {
+  color: var(--sl-color-gray-2) !important;
+}
+
+.markvia-playground__secondary-action:hover {
+  background: var(--sl-color-gray-6) !important;
+}
+
+.markvia-playground__toolbar-actions button {
+  margin: 0 !important;
+}
+
+.markvia-playground__controls {
+  display: grid;
+  gap: 1px;
+  margin: 0;
+  background: var(--markvia-panel-border);
+}
+
+.markvia-playground__editor-pane,
+.markvia-playground__preview-pane,
+.markvia-playground__inspect {
+  min-width: 0;
+  background: var(--sl-color-bg);
+  padding: 1rem;
+}
+
+.markvia-playground__section-heading {
+  margin-bottom: 0.7rem;
+  color: var(--sl-color-white);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.markvia-playground__section-heading span:last-child {
+  color: var(--sl-color-gray-3);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.markvia-playground textarea {
+  display: block;
+  min-height: 24rem;
+  width: 100%;
+  resize: vertical;
+  padding: 1rem;
+  color: var(--sl-color-white);
+  font-family: var(--sl-font-mono);
+  font-size: 0.9rem;
+  line-height: 1.65;
+}
+
+.markvia-playground__preview-pane {
+  display: flex;
+  min-height: 28rem;
+  flex-direction: column;
+  margin: 0;
+}
+
+.markvia-playground__renderer-tabs,
+.markvia-playground__panel-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.15rem;
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 0.5rem;
+  background: var(--sl-color-black);
+  padding: 0.2rem;
+}
+
+.markvia-playground__renderer-tabs {
+  margin: 0 0 0.8rem;
+}
+
+.markvia-playground__renderer-tabs button,
+.markvia-playground__panel-tabs button {
+  min-height: 1.9rem;
+  border-color: transparent !important;
+  border-radius: 0.32rem;
+  padding: 0.3rem 0.65rem;
+  color: var(--sl-color-gray-3);
+  font-size: 0.78rem;
+}
+
+.markvia-playground__renderer-tabs button:hover,
+.markvia-playground__panel-tabs button:hover {
+  background: var(--sl-color-gray-7);
+  color: var(--sl-color-white);
+}
+
+.markvia-playground__renderer-tabs button[aria-selected='true'],
+.markvia-playground__panel-tabs button[aria-selected='true'] {
+  border-color: transparent !important;
+  background: var(--sl-color-gray-6);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--sl-color-black) 35%, transparent);
+  color: var(--sl-color-white);
+}
+
+.markvia-playground__renderer-tabs > *,
+.markvia-playground__panel-tabs > * {
+  margin: 0 !important;
+}
+
+.markvia-playground__output {
+  flex: 1;
+  min-height: 19rem;
+  overflow: auto;
+  margin: 0;
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 0.65rem;
+  background: var(--sl-color-bg);
+  padding: 1.2rem;
+}
+
+.markvia-playground__markdown {
+  color: var(--sl-color-text);
+}
+
+.markvia-playground__markdown > div > :first-child {
+  margin-top: 0;
+}
+
+.markvia-playground__markdown > div > :last-child {
+  margin-bottom: 0;
+}
+
+.markvia-playground__vue-preview {
+  min-height: 100%;
+}
+
+.markvia-playground__loading,
+.markvia-playground__inspect-hint,
+.markvia-playground__feedback {
+  color: var(--sl-color-gray-3);
+}
+
+.markvia-playground__loading,
+.markvia-playground__error {
+  margin: 0;
+}
+
+.markvia-playground__error {
+  color: var(--sl-color-red-high);
+}
+
+.markvia-playground__inspect {
+  margin: 0;
+  border-top: 1px solid var(--markvia-panel-border);
+}
+
+.markvia-playground__inspect-heading {
+  color: var(--sl-color-white);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.markvia-playground__inspect-hint {
+  margin: 1rem 0 0;
+}
+
+.markvia-playground__code-output {
+  max-height: 24rem;
+  overflow: auto;
+  margin: 1rem 0 0;
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 0.65rem;
+  background: var(--sl-color-black);
+  padding: 1rem;
+  color: var(--sl-color-gray-2);
+  font-size: 0.8rem;
+  line-height: 1.6;
+  white-space: pre;
+}
+
+.markvia-playground__feedback {
+  min-height: 1.4rem;
+  margin: 0;
+  padding: 0 1rem 1rem;
+  font-size: 0.8rem;
+}
+
+@media (min-width: 52rem) {
+  .markvia-playground__controls {
+    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+  }
+
+  .markvia-playground__editor-pane,
+  .markvia-playground__preview-pane {
+    padding: 1.25rem;
+  }
+}
+
+@media (max-width: 36rem) {
+  .markvia-playground__toolbar {
+    align-items: stretch;
+  }
+
+  .markvia-playground__select {
+    width: 100%;
+  }
+
+  .markvia-playground__toolbar-actions {
+    width: 100%;
+    justify-content: flex-start;
+    margin-left: 0;
+    margin-top: 0;
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .markvia-playground__toolbar-actions button.markvia-playground__toolbar-button {
+    flex: 0 1 auto;
+  }
+
+  .markvia-playground__inspect-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

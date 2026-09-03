@@ -1,40 +1,49 @@
 ---
 title: Markvia
 description: 面向静态、流式和交互式内容的通用 Markdown Runtime。
+template: splash
+prev: false
+next: false
+hero:
+  title: 一次编写，处处渲染。
+  tagline: 面向静态页面、流式输入和交互式内容的通用 Markdown runtime。
+  actions:
+    - text: 打开 Playground
+      link: /zh-cn/playground/
+      variant: primary
+    - text: 开始使用
+      link: /zh-cn/getting-started/
+      variant: secondary
 ---
 
-import { Tabs, TabItem } from '@astrojs/starlight/components'
-import AstInspector from '../../../components/demos/AstInspector.astro'
+import { Card, CardGrid } from '@astrojs/starlight/components'
 import HtmlDemo from '../../../components/demos/HtmlDemo.astro'
-import ReactMarkdownDemo from '../../../components/demos/ReactMarkdownDemo.tsx'
-import VueMarkdownDemo from '../../../components/demos/VueMarkdownDemo.vue'
 import { rendererSampleMarkdownZh as sampleMarkdown } from '../../../components/demos/sampleContent'
 
-# 通用 Markdown Runtime
+<div class="markvia-landing__intro">
 
-Markvia 将 Markdown 解析为统一的 Semantic AST 和 Render IR，然后适配到 HTML、React 和 Vue。
+Markvia 将 Markdown 解析为统一的 Semantic AST 和 Render IR，再把同一份文档适配到 HTML、React 和 Vue。
 
-下面的示例使用相同的 Markdown 内容，通过三个 renderer 输出：
+</div>
 
-<Tabs syncKey="renderer">
-  <TabItem label="HTML">
-    <HtmlDemo content={sampleMarkdown} locale="zh-CN" />
-  </TabItem>
-  <TabItem label="React">
-    <ReactMarkdownDemo client:visible initialContent={sampleMarkdown} locale="zh-CN" />
-  </TabItem>
-  <TabItem label="Vue">
-    <VueMarkdownDemo client:visible initialContent={sampleMarkdown} locale="zh-CN" />
-  </TabItem>
-</Tabs>
+## 一份源码，多个目标
 
-<AstInspector content={sampleMarkdown} locale="zh-CN" />
+下面的轻量预览使用与静态输出相同的安全 HTML renderer。打开 Playground，即可编辑源码并交互式比较多个目标。
 
-## 设计目标
+<HtmlDemo content={sampleMarkdown} locale="zh-CN" />
 
-- 框架无关的 Markdown runtime contract
-- 静态页面、交互组件和流式输入共用一套 AST/IR pipeline
-- 安全的 HTML 输出与稳定的节点 ID
-- 可扩展的 document transform、IR transform 和代码高亮 hook
+<CardGrid>
+  <Card title="统一语义 pipeline" icon="document">
+    只解析一次，保持稳定的节点 ID，并让不同 renderer 共用同一份 Render IR。
+  </Card>
+  <Card title="默认安全" icon="padlock">
+    文本会被转义，不安全 URL 会被拒绝，raw HTML 默认保持不可执行状态。
+  </Card>
+  <Card title="为变化而生" icon="rocket">
+    支持增量 Markdown stream、document transform 和代码高亮 hook，同时保持 renderer contract 不变。
+  </Card>
+</CardGrid>
 
-阅读[开始使用](./getting-started/)了解如何安装 Markvia，或直接查看[renderer 指南](./renderers/)和[streaming 指南](./streaming/)。
+## 开始探索
+
+从[开始使用](./getting-started/)入门，查看[renderer 集成](./renderers/)，或在[Playground](./playground/)中测试自己的内容。

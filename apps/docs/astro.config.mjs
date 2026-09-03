@@ -26,6 +26,11 @@ export default defineConfig({
       },
       sidebar: [
         {
+          slug: 'playground',
+          label: 'Playground',
+          translations: { 'zh-CN': 'Playground' },
+        },
+        {
           label: 'Get started',
           translations: { 'zh-CN': '开始使用' },
           items: ['index', 'getting-started', 'renderers'],

@@ -1,0 +1,20 @@
+---
+title: Playground
+description: Edit Markdown, compare HTML, React and Vue output, and inspect the shared AST and Render IR.
+template: splash
+prev: false
+next: false
+sidebar:
+  order: -1
+---
+
+import MarkdownPlayground from '../../components/playground/MarkdownPlayground.tsx'
+
+<MarkdownPlayground client:load locale="en" />
+
+## What to try
+
+- Switch between the HTML, React, and Vue renderers.
+- Open the HTML panel to inspect safe generated markup.
+- Open the AST / IR panel to see how Markvia represents the document.
+- Use the share button to copy the current Markdown and view settings in a URL.
