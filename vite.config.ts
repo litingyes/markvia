@@ -11,6 +11,8 @@ export default defineConfig({
       '@markvia/react': workspacePath('./packages/react/src/index.tsx'),
       '@markvia/vue': workspacePath('./packages/vue/src/index.ts'),
       '@markvia/shiki': workspacePath('./packages/shiki/src/index.ts'),
+      '@markvia/math': workspacePath('./packages/math/src/index.ts'),
+      '@markvia/mermaid': workspacePath('./packages/mermaid/src/index.ts'),
     },
   },
   fmt: {

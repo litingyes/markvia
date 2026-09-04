@@ -1,3 +1,6 @@
+import type { Extension as MdastExtension } from 'mdast-util-from-markdown'
+import type { Extension as MicromarkExtension } from 'micromark-util-types'
+
 export type NodeType =
   | 'document'
   | 'heading'
@@ -20,6 +23,9 @@ export type NodeType =
   | 'table'
   | 'tableRow'
   | 'tableCell'
+  | 'mathInline'
+  | 'mathBlock'
+  | 'diagram'
 
 export interface Point {
   offset: number
@@ -161,6 +167,26 @@ export interface TableCellNode extends BaseNode {
   children: MarkdownNode[]
 }
 
+export interface MathInlineNode extends BaseNode {
+  type: 'mathInline'
+  value: string
+}
+
+export interface MathBlockNode extends BaseNode {
+  type: 'mathBlock'
+  value: string
+  meta: string | null
+  incomplete: boolean
+}
+
+export interface DiagramNode extends BaseNode {
+  type: 'diagram'
+  language: 'mermaid'
+  meta: string | null
+  value: string
+  incomplete: boolean
+}
+
 export type MarkdownNode =
   | HeadingNode
   | ParagraphNode
@@ -182,13 +208,16 @@ export type MarkdownNode =
   | TableNode
   | TableRowNode
   | TableCellNode
+  | MathInlineNode
+  | MathBlockNode
+  | DiagramNode
 
 export type MarkdownDocument = DocumentNode
 
 export interface RenderTextNode {
   kind: 'text'
   id: string
-  sourceType: NodeType
+  sourceType: RenderSourceType
   position: SourcePosition
   value: string
 }
@@ -196,7 +225,7 @@ export interface RenderTextNode {
 export interface RenderElementNode {
   kind: 'element'
   id: string
-  sourceType: NodeType
+  sourceType: RenderSourceType
   position: SourcePosition
   tag: string
   props: Record<string, RenderPropValue>
@@ -211,6 +240,8 @@ export interface RenderRawNode {
   value: string
 }
 
+export type RenderSourceType = NodeType | 'fragment'
+
 export type RenderNode = RenderTextNode | RenderElementNode | RenderRawNode
 
 export interface RenderDocument {
@@ -224,6 +255,20 @@ export interface RenderStyle {
 }
 
 export type RenderPropValue = string | number | boolean | RenderStyle
+
+export interface RenderFragmentText {
+  kind: 'text'
+  value: string
+}
+
+export interface RenderFragmentElement {
+  kind: 'element'
+  tag: string
+  props?: Record<string, RenderPropValue>
+  children: RenderFragment[]
+}
+
+export type RenderFragment = RenderFragmentText | RenderFragmentElement
 
 export interface HighlightToken {
   content: string
@@ -243,10 +288,42 @@ export interface CodeHighlighter {
   highlight(code: string, language: string | null): HighlightOutput | Promise<HighlightOutput>
 }
 
+export type ExtensionNode = MathInlineNode | MathBlockNode | DiagramNode
+
+export interface ExtensionProvider<TNode extends ExtensionNode = ExtensionNode> {
+  isAsync?: boolean
+  render(node: TNode): RenderFragment | Promise<RenderFragment>
+}
+
+export interface MarkdownParserContext {
+  source: string
+  blockContext: boolean
+  range(node: unknown): { start: number; end: number }
+  createNode<T extends MarkdownNode>(
+    type: T['type'],
+    start: number,
+    end: number,
+    fields: Omit<T, 'id' | 'type' | 'position'>,
+  ): T
+  mapChildren(nodes: readonly unknown[], blockContext?: boolean): MarkdownNode[]
+}
+
+export interface MarkdownParserExtension {
+  name: string
+  syntax?: MicromarkExtension
+  mdast?: MdastExtension
+  mapNode?(node: unknown, context: MarkdownParserContext): MarkdownNode[] | undefined
+}
+
 export type DocumentTransform = (document: MarkdownDocument) => MarkdownDocument
 export type IRTransform = (ir: RenderDocument) => RenderDocument
 
 export interface PluginContext {
+  addParserExtension(extension: MarkdownParserExtension): void
+  addNodeRenderer<TNode extends ExtensionNode>(
+    type: TNode['type'],
+    renderer: ExtensionProvider<TNode>,
+  ): void
   addDocumentTransform(transform: DocumentTransform): void
   addIRTransform(transform: IRTransform): void
 }
@@ -291,9 +368,11 @@ export interface MarkdownStream {
 }
 
 export interface MarkdownRuntime {
+  readonly requiresAsyncIR: boolean
   parse(source: string): MarkdownDocument
   toIR(document: MarkdownDocument): RenderDocument
   toIRAsync(document: MarkdownDocument): Promise<RenderDocument>
+  toIRFallback(document: MarkdownDocument): RenderDocument
   render<T>(source: string | MarkdownDocument, renderer: Renderer<T>): T
   renderAsync<T>(source: string | MarkdownDocument, renderer: Renderer<T>): Promise<T>
   createStream(): MarkdownStream

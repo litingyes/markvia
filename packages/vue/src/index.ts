@@ -39,9 +39,9 @@ function renderNode(
   }
 
   const children = node.children.map((child) => renderNode(child, components))
-  const component = components[node.sourceType]
+  const component = node.sourceType === 'fragment' ? undefined : components[node.sourceType]
   return component
-    ? h(component, { ...node.props, key: node.id, node }, children)
+    ? h(component, { ...node.props, key: node.id, node }, { default: () => children })
     : h(node.tag, { ...node.props, key: node.id }, children)
 }
 
@@ -91,7 +91,6 @@ export const Markdown = defineComponent({
       ...(props.plugins ? { plugins: props.plugins } : {}),
       ...(props.highlighter ? { highlighter: props.highlighter } : {}),
     })
-    const fallbackRuntime = createMarkdown(props.plugins ? { plugins: props.plugins } : {})
     const currentDocument = ref<MarkdownDocument>(
       props.document ?? runtime.parse(props.content ?? ''),
     )
@@ -128,7 +127,7 @@ export const Markdown = defineComponent({
     )
     watch(() => props.stream, attachStream, { immediate: true })
     const renderAsyncDocument = (document: MarkdownDocument) => {
-      if (props.highlighter?.isAsync !== true) {
+      if (!runtime.requiresAsyncIR) {
         asyncRender.value = null
         return
       }
@@ -157,7 +156,7 @@ export const Markdown = defineComponent({
 
     return () => {
       const document = currentDocument.value
-      if (props.highlighter?.isAsync === true) {
+      if (runtime.requiresAsyncIR) {
         if (asyncRender.value?.document === document && 'error' in asyncRender.value) {
           throw asyncRender.value.error
         }
@@ -165,7 +164,7 @@ export const Markdown = defineComponent({
         const ir =
           asyncRender.value?.document === document && asyncRender.value.ir
             ? asyncRender.value.ir
-            : fallbackRuntime.toIR(document)
+            : runtime.toIRFallback(document)
         return renderVue(ir, props.components ? { components: props.components } : {})
       }
 

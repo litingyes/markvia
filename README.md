@@ -16,13 +16,15 @@ Markvia parses Markdown into a shared Semantic AST and Render IR, then lets HTML
 
 ## Packages
 
-| Package          | Purpose                                                           |
-| ---------------- | ----------------------------------------------------------------- |
-| `@markvia/core`  | Markdown parsing, Semantic AST, Render IR, plugins, and streaming |
-| `@markvia/html`  | HTML rendering with optional raw HTML compatibility mode          |
-| `@markvia/react` | React renderer and `Markdown` component                           |
-| `@markvia/vue`   | Vue renderer and `Markdown` component                             |
-| `@markvia/shiki` | Optional Shiki adapter with dynamic language loading              |
+| Package            | Purpose                                                           |
+| ------------------ | ----------------------------------------------------------------- |
+| `@markvia/core`    | Markdown parsing, Semantic AST, Render IR, plugins, and streaming |
+| `@markvia/html`    | HTML rendering with optional raw HTML compatibility mode          |
+| `@markvia/react`   | React renderer and `Markdown` component                           |
+| `@markvia/vue`     | Vue renderer and `Markdown` component                             |
+| `@markvia/shiki`   | Optional Shiki adapter with dynamic language loading              |
+| `@markvia/math`    | Optional math syntax plugin and provider contract                 |
+| `@markvia/mermaid` | Optional Mermaid diagram syntax plugin and provider contract      |
 
 ## Quick start
 
@@ -104,6 +106,31 @@ stream.finish()
 
 Pass each update’s `document` to the React or Vue `Markdown` component to render live input.
 
+### Optional math and Mermaid syntax
+
+Math and Mermaid support are maintained as optional packages and are not installed with
+`@markvia/core`:
+
+```bash
+pnpm add @markvia/math @markvia/mermaid
+```
+
+```ts
+import { createMathPlugin } from '@markvia/math'
+import { createMermaidPlugin } from '@markvia/mermaid'
+
+const runtime = createMarkdown({
+  plugins: [
+    createMathPlugin({ provider: mathProvider }),
+    createMermaidPlugin({ provider: mermaidProvider }),
+  ],
+})
+```
+
+If math is not used, do not install `@markvia/math`; its parser dependencies are then not
+installed either. Neither optional package installs a rendering engine. Install and connect your
+own provider only when the application needs rendered MathML or SVG output.
+
 ## Security
 
 HTML output escapes text and raw HTML by default, filters event attributes, and rejects unsafe URLs such as `javascript:` and `data:`. Unsafe links retain their text and receive `data-markvia-unsafe-url="true"`.
@@ -126,7 +153,7 @@ Markvia’s baseline is CommonMark 0.29 plus formal GFM 0.29. `createMarkdown()`
 The following are intentionally outside the current scope:
 
 - GitHub product-layer extensions such as footnotes, Alerts, MDX, frontmatter, issue/PR references, and emoji
-- Math, Mermaid, Component Markdown, and CLI
+- Component Markdown and CLI
 
 ## Documentation
 

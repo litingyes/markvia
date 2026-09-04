@@ -54,7 +54,7 @@ function renderNode(
   }
 
   const children = node.children.map((child) => renderNode(child, components))
-  const component = components[node.sourceType]
+  const component = node.sourceType === 'fragment' ? undefined : components[node.sourceType]
   if (component) {
     return voidTags.has(node.tag)
       ? createElement(component, { ...node.props, key: node.id, node })
@@ -115,10 +115,6 @@ export function Markdown(props: MarkdownProps): ReactNode {
     () => createMarkdown(runtimeOptions(props)),
     [props.plugins, props.highlighter],
   )
-  const fallbackRuntime = useMemo(
-    () => createMarkdown(props.plugins ? { plugins: props.plugins } : {}),
-    [props.plugins],
-  )
   const [streamDocument, setStreamDocument] = useState<MarkdownDocument | null>(
     () => props.stream?.getDocument() ?? null,
   )
@@ -138,14 +134,14 @@ export function Markdown(props: MarkdownProps): ReactNode {
   const document = props.stream
     ? (streamDocument ?? props.stream.getDocument())
     : (props.document ?? parsedDocument)
-  const isAsyncHighlighter = props.highlighter?.isAsync === true
+  const requiresAsyncIR = runtime.requiresAsyncIR
   const fallbackIR = useMemo(
-    () => (isAsyncHighlighter ? fallbackRuntime.toIR(document) : null),
-    [document, fallbackRuntime, isAsyncHighlighter],
+    () => (requiresAsyncIR ? runtime.toIRFallback(document) : null),
+    [document, requiresAsyncIR, runtime],
   )
 
   useEffect(() => {
-    if (!isAsyncHighlighter) {
+    if (!requiresAsyncIR) {
       setAsyncRender(null)
       return
     }
@@ -168,14 +164,14 @@ export function Markdown(props: MarkdownProps): ReactNode {
     return () => {
       cancelled = true
     }
-  }, [document, isAsyncHighlighter, runtime])
+  }, [document, requiresAsyncIR, runtime])
 
   const syncIR = useMemo(
-    () => (isAsyncHighlighter ? null : runtime.toIR(document)),
-    [document, isAsyncHighlighter, runtime],
+    () => (requiresAsyncIR ? null : runtime.toIR(document)),
+    [document, requiresAsyncIR, runtime],
   )
 
-  if (isAsyncHighlighter) {
+  if (requiresAsyncIR) {
     if (asyncRender?.document === document && 'error' in asyncRender) {
       throw asyncRender.error
     }

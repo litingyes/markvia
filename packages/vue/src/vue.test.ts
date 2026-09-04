@@ -4,7 +4,7 @@ import { createApp, createSSRApp, defineComponent, h, nextTick, ref } from 'vue'
 import { renderToString } from '@vue/server-renderer'
 import { describe, expect, it } from 'vite-plus/test'
 import { Markdown, renderVue } from './index'
-import { createMarkdown } from '@markvia/core'
+import { createMarkdown, type MathInlineNode, type MarkdownParserExtension } from '@markvia/core'
 import { markdownFixtures } from '../../core/test/markdown-fixtures'
 import { canonicalHtml } from '../../core/test/markdown-test-utils'
 
@@ -21,6 +21,31 @@ function deferred<T>() {
 async function flushVue() {
   await new Promise((resolve) => setTimeout(resolve, 0))
   await nextTick()
+}
+
+const extensionParser: MarkdownParserExtension = {
+  name: 'renderer-test-extension',
+  mapNode(node, context) {
+    if (
+      typeof node !== 'object' ||
+      node === null ||
+      !('type' in node) ||
+      node.type !== 'code' ||
+      !('lang' in node) ||
+      node.lang !== 'test' ||
+      !('value' in node) ||
+      typeof node.value !== 'string'
+    ) {
+      return undefined
+    }
+
+    const range = context.range(node)
+    return [
+      context.createNode<MathInlineNode>('mathInline', range.start, range.end, {
+        value: node.value,
+      }),
+    ]
+  },
 }
 
 describe('@markvia/vue', () => {
@@ -103,6 +128,49 @@ describe('@markvia/vue', () => {
     expect(documentMarkup).toContain('document')
     expect(streamMarkup).toContain('stream')
     expect(componentMarkup).toMatch(/<section[^>]*>component<\/section>/)
+  })
+
+  it('renders extension providers through the same IR and component contract', async () => {
+    const runtime = createMarkdown({
+      plugins: [
+        {
+          name: 'renderer-test-plugin',
+          setup: (context) => {
+            context.addParserExtension(extensionParser)
+            context.addNodeRenderer('mathInline', {
+              render: (node) => ({
+                kind: 'element',
+                tag: 'span',
+                props: { 'data-value': node.value },
+                children: [{ kind: 'text', value: node.value }],
+              }),
+            })
+          },
+        },
+      ],
+    })
+    const CustomMath = defineComponent({
+      setup(_, { slots }) {
+        return () => h('em', null, slots.default?.())
+      },
+    })
+    const source = '```test\nx\n```'
+    const providerMarkup = await renderToString(
+      createSSRApp({
+        render: () => renderVue(runtime.toIR(runtime.parse(source))),
+      }),
+    )
+    const markup = await renderToString(
+      createSSRApp({
+        render: () =>
+          renderVue(runtime.toIR(runtime.parse(source)), {
+            components: { mathInline: CustomMath },
+          }),
+      }),
+    )
+
+    expect(providerMarkup).toMatch(/<span[^>]*data-value="x"[^>]*>x<\/span>/)
+    expect(markup).toContain('>x</em>')
   })
 
   it('updates content and document props and detaches stream listeners', async () => {

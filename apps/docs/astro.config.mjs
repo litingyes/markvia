@@ -39,7 +39,7 @@ export default defineConfig({
         {
           label: 'Runtime capabilities',
           translations: { 'zh-CN': '运行时能力' },
-          items: ['streaming', 'plugins', 'highlighting'],
+          items: ['streaming', 'plugins', 'highlighting', 'extensions'],
         },
         {
           label: 'Reference',
@@ -59,6 +59,8 @@ export default defineConfig({
         '@markvia/react': sourcePath('../../packages/react/src/index.tsx'),
         '@markvia/vue': sourcePath('../../packages/vue/src/index.ts'),
         '@markvia/shiki': sourcePath('../../packages/shiki/src/index.ts'),
+        '@markvia/math': sourcePath('../../packages/math/src/index.ts'),
+        '@markvia/mermaid': sourcePath('../../packages/mermaid/src/index.ts'),
       },
     },
   },

@@ -1,7 +1,7 @@
 {
-  "name": "@markvia/core",
+  "name": "@markvia/math",
   "version": "0.1.0",
-  "description": "Framework-agnostic Markdown runtime core",
+  "description": "Math syntax plugin for Markvia",
   "bugs": {
     "url": "https://github.com/litingyes/markvia/issues"
   },
@@ -9,7 +9,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/litingyes/markvia.git",
-    "directory": "packages/core"
+    "directory": "packages/math"
   },
   "files": [
     "dist"
@@ -32,18 +32,10 @@
     "build": "vp pack src/index.ts"
   },
   "dependencies": {
-    "mdast-util-from-markdown": "^2.0.3",
-    "mdast-util-gfm-autolink-literal": "^2.0.1",
-    "mdast-util-gfm-strikethrough": "^2.0.0",
-    "mdast-util-gfm-table": "^2.0.0",
-    "mdast-util-gfm-task-list-item": "^2.0.0",
-    "micromark-extension-gfm-autolink-literal": "^2.1.0",
-    "micromark-extension-gfm-strikethrough": "^2.1.0",
-    "micromark-extension-gfm-table": "^2.1.1",
-    "micromark-extension-gfm-task-list-item": "^2.1.0",
+    "@markvia/core": "workspace:*",
+    "mdast-util-math": "^3.0.0",
+    "micromark-factory-space": "^2.0.1",
+    "micromark-util-character": "^2.1.1",
     "micromark-util-types": "^2.0.2"
-  },
-  "devDependencies": {
-    "@types/mdast": "^4.0.4"
   }
 }

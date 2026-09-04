@@ -18,7 +18,9 @@
       "@markvia/html": ["./packages/html/src/index.ts"],
       "@markvia/react": ["./packages/react/src/index.tsx"],
       "@markvia/vue": ["./packages/vue/src/index.ts"],
-      "@markvia/shiki": ["./packages/shiki/src/index.ts"]
+      "@markvia/shiki": ["./packages/shiki/src/index.ts"],
+      "@markvia/math": ["./packages/math/src/index.ts"],
+      "@markvia/mermaid": ["./packages/mermaid/src/index.ts"]
     }
   },
   "include": [

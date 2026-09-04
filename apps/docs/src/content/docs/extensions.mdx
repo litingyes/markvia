@@ -1,0 +1,64 @@
+---
+title: Math and Mermaid extensions
+description: Optional math and Mermaid syntax plugins for Markvia.
+sidebar:
+  order: 4
+---
+
+Math and Mermaid are optional packages. They are not dependencies of `@markvia/core`.
+
+```bash
+pnpm add @markvia/math @markvia/mermaid
+```
+
+Use only the plugin that your application needs:
+
+```ts
+import { createMarkdown } from '@markvia/core'
+import { createMathPlugin } from '@markvia/math'
+import { createMermaidPlugin } from '@markvia/mermaid'
+
+const runtime = createMarkdown({
+  plugins: [
+    createMathPlugin({ provider: mathProvider }),
+    createMermaidPlugin({ provider: mermaidProvider }),
+  ],
+})
+```
+
+## Math syntax
+
+````md
+Inline math: $x^2$
+
+$$
+\int_0^1 x^2 dx
+$$
+
+```math
+\frac{a}{b}
+```
+````
+
+Without `@markvia/math`, these remain ordinary Markdown text or code blocks.
+
+## Mermaid syntax
+
+````md
+```mermaid
+graph TD
+  A --> B
+```
+````
+
+Without `@markvia/mermaid`, Mermaid remains a regular code block.
+
+## Providers
+
+Providers can be synchronous or asynchronous and must return structured render fragments. They
+must not return raw HTML. When a provider is missing or fails, Markvia displays the source in a
+safe code fallback.
+
+If math is not used, do not install `@markvia/math`; its parser dependencies are then not
+installed. Neither optional package installs a rendering engine. Install the rendering engine and
+connect it through a provider only when rendered output is needed.

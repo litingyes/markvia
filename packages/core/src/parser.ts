@@ -24,6 +24,8 @@ import type {
   ListItemNode,
   ListNode,
   MarkdownNode,
+  MarkdownParserContext,
+  MarkdownParserExtension,
   ParagraphNode,
   Point,
   SourcePosition,
@@ -129,9 +131,13 @@ function hash(value: string): string {
   return (result >>> 0).toString(36)
 }
 
-function nodeRange(node: Content, fallback = 0): { start: number; end: number } {
-  const start = node.position?.start.offset ?? fallback
-  const end = node.position?.end.offset ?? start
+function nodeRange(node: unknown, fallback = 0): { start: number; end: number } {
+  const position =
+    typeof node === 'object' && node !== null && 'position' in node
+      ? (node as { position?: { start?: { offset?: number }; end?: { offset?: number } } }).position
+      : undefined
+  const start = position?.start?.offset ?? fallback
+  const end = position?.end?.offset ?? start
 
   return { start, end: Math.max(start, end) }
 }
@@ -208,8 +214,27 @@ function mapNode(
   node: Content,
   definitions: Map<string, Definition>,
   blockContext: boolean,
+  extensions: readonly MarkdownParserExtension[],
 ): MarkdownNode[] {
   const range = nodeRange(node)
+
+  const context: MarkdownParserContext = {
+    source,
+    blockContext,
+    range: nodeRange,
+    createNode: (type, start, end, fields) => factory.node(type, start, end, fields),
+    mapChildren: (nodes, childBlockContext = false) =>
+      (nodes as readonly Content[]).flatMap((child) =>
+        mapNode(source, factory, child, definitions, childBlockContext, extensions),
+      ),
+  }
+
+  for (const extension of extensions) {
+    const mapped = extension.mapNode?.(node, context)
+    if (mapped !== undefined) {
+      return mapped
+    }
+  }
 
   switch (node.type) {
     case 'text':
@@ -218,31 +243,31 @@ function mapNode(
       return [
         factory.node<HeadingNode>('heading', range.start, range.end, {
           level: node.depth,
-          children: mapChildren(source, factory, node.children, definitions, false),
+          children: mapChildren(source, factory, node.children, definitions, false, extensions),
         }),
       ]
     case 'paragraph':
       return [
         factory.node<ParagraphNode>('paragraph', range.start, range.end, {
-          children: mapChildren(source, factory, node.children, definitions, false),
+          children: mapChildren(source, factory, node.children, definitions, false, extensions),
         }),
       ]
     case 'emphasis':
       return [
         factory.node<EmphasisNode>('emphasis', range.start, range.end, {
-          children: mapChildren(source, factory, node.children, definitions, false),
+          children: mapChildren(source, factory, node.children, definitions, false, extensions),
         }),
       ]
     case 'strong':
       return [
         factory.node<StrongNode>('strong', range.start, range.end, {
-          children: mapChildren(source, factory, node.children, definitions, false),
+          children: mapChildren(source, factory, node.children, definitions, false, extensions),
         }),
       ]
     case 'delete':
       return [
         factory.node<DeleteNode>('delete', range.start, range.end, {
-          children: mapChildren(source, factory, node.children, definitions, false),
+          children: mapChildren(source, factory, node.children, definitions, false, extensions),
         }),
       ]
     case 'inlineCode':
@@ -258,7 +283,7 @@ function mapNode(
         factory.node<LinkNode>('link', range.start, range.end, {
           url: node.url,
           title: node.title ?? null,
-          children: mapChildren(source, factory, node.children, definitions, false),
+          children: mapChildren(source, factory, node.children, definitions, false, extensions),
         }),
       ]
     case 'linkReference': {
@@ -271,7 +296,7 @@ function mapNode(
         factory.node<LinkNode>('link', range.start, range.end, {
           url: definition.url,
           title: definition.title ?? null,
-          children: mapChildren(source, factory, node.children, definitions, false),
+          children: mapChildren(source, factory, node.children, definitions, false, extensions),
         }),
       ]
     }
@@ -311,7 +336,7 @@ function mapNode(
     case 'blockquote':
       return [
         factory.node<BlockquoteNode>('blockquote', range.start, range.end, {
-          children: mapChildren(source, factory, node.children, definitions, true),
+          children: mapChildren(source, factory, node.children, definitions, true, extensions),
         }),
       ]
     case 'list':
@@ -321,7 +346,7 @@ function mapNode(
           start: node.ordered ? (node.start ?? 1) : null,
           spread: node.spread ?? false,
           children: node.children.flatMap((child) =>
-            mapNode(source, factory, child, definitions, true),
+            mapNode(source, factory, child, definitions, true, extensions),
           ) as ListItemNode[],
         }),
       ]
@@ -330,7 +355,7 @@ function mapNode(
         factory.node<ListItemNode>('listItem', range.start, range.end, {
           checked: node.checked ?? null,
           spread: node.spread ?? false,
-          children: mapChildren(source, factory, node.children, definitions, true),
+          children: mapChildren(source, factory, node.children, definitions, true, extensions),
         }),
       ]
     case 'html':
@@ -354,7 +379,7 @@ function mapNode(
         factory.node<TableNode>('table', range.start, range.end, {
           alignments: (node.align ?? []).map((alignment) => alignment ?? null),
           children: node.children.flatMap((child) =>
-            mapNode(source, factory, child, definitions, true),
+            mapNode(source, factory, child, definitions, true, extensions),
           ) as TableRowNode[],
         }),
       ]
@@ -362,14 +387,14 @@ function mapNode(
       return [
         factory.node<TableRowNode>('tableRow', range.start, range.end, {
           children: node.children.flatMap((child) =>
-            mapNode(source, factory, child, definitions, false),
+            mapNode(source, factory, child, definitions, false, extensions),
           ) as TableCellNode[],
         }),
       ]
     case 'tableCell':
       return [
         factory.node<TableCellNode>('tableCell', range.start, range.end, {
-          children: mapChildren(source, factory, node.children, definitions, false),
+          children: mapChildren(source, factory, node.children, definitions, false, extensions),
         }),
       ]
     default:
@@ -383,18 +408,32 @@ function mapChildren(
   nodes: readonly Content[],
   definitions: Map<string, Definition>,
   blockContext: boolean,
+  extensions: readonly MarkdownParserExtension[],
 ): MarkdownNode[] {
-  return nodes.flatMap((node) => mapNode(source, factory, node, definitions, blockContext))
+  return nodes.flatMap((node) =>
+    mapNode(source, factory, node, definitions, blockContext, extensions),
+  )
 }
 
-export function parseMarkdown(source: string): DocumentNode {
+export interface ParseMarkdownOptions {
+  extensions?: readonly MarkdownParserExtension[]
+}
+
+export function parseMarkdown(source: string, options: ParseMarkdownOptions = {}): DocumentNode {
   const factory = new NodeFactory(source)
+  const extensions = options.extensions ?? []
   let parsed: Root
 
   try {
     parsed = fromMarkdown(source, {
-      extensions: markdownExtensions,
-      mdastExtensions,
+      extensions: [
+        ...markdownExtensions,
+        ...extensions.flatMap((extension) => (extension.syntax ? [extension.syntax] : [])),
+      ],
+      mdastExtensions: [
+        ...mdastExtensions,
+        ...extensions.flatMap((extension) => (extension.mdast ? [extension.mdast] : [])),
+      ],
     })
   } catch {
     // Keep hostile or pathological delimiter input renderable even if the
@@ -410,7 +449,7 @@ export function parseMarkdown(source: string): DocumentNode {
     }
 
     return factory.node<DocumentNode>('document', 0, source.length, {
-      children: mapChildren(source, factory, parsed.children, definitions, true),
+      children: mapChildren(source, factory, parsed.children, definitions, true, extensions),
     })
   } catch {
     return fallbackDocument(source, factory)

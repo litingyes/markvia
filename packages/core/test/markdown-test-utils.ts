@@ -78,6 +78,23 @@ export function projectNode(node: MarkdownNode): unknown {
         value: node.value,
         incomplete: node.incomplete,
       }
+    case 'mathInline':
+      return { type: node.type, value: node.value }
+    case 'mathBlock':
+      return {
+        type: node.type,
+        meta: node.meta,
+        value: node.value,
+        incomplete: node.incomplete,
+      }
+    case 'diagram':
+      return {
+        type: node.type,
+        language: node.language,
+        meta: node.meta,
+        value: node.value,
+        incomplete: node.incomplete,
+      }
     case 'html':
       return { type: node.type, value: node.value, block: node.block }
     case 'definition':

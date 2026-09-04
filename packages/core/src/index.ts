@@ -1,5 +1,5 @@
 export { documentToIR, documentToIRAsync } from './ir'
-export { parseMarkdown } from './parser'
+export { parseMarkdown, type ParseMarkdownOptions } from './parser'
 export { createMarkdown } from './runtime'
 export { escapeHtml, isSafeUrl } from './security'
 export type {
@@ -9,11 +9,14 @@ export type {
   CodeHighlighter,
   CodeNode,
   CreateMarkdownOptions,
+  DiagramNode,
   DeleteNode,
   DefinitionNode,
   DocumentNode,
   DocumentTransform,
   EmphasisNode,
+  ExtensionNode,
+  ExtensionProvider,
   HeadingNode,
   HighlightOutput,
   HighlightResult,
@@ -27,6 +30,8 @@ export type {
   ListNode,
   MarkdownDocument,
   MarkdownNode,
+  MarkdownParserContext,
+  MarkdownParserExtension,
   MarkdownPlugin,
   MarkdownRuntime,
   MarkdownStream,
@@ -36,10 +41,13 @@ export type {
   Point,
   RenderDocument,
   RenderElementNode,
+  RenderFragment,
+  RenderFragmentElement,
   RenderPropValue,
   Renderer,
   RenderRawNode,
   RenderNode,
+  RenderSourceType,
   RenderTextNode,
   RenderStyle,
   SourcePosition,
@@ -52,4 +60,6 @@ export type {
   TableRowNode,
   TextNode,
   ThematicBreakNode,
+  MathBlockNode,
+  MathInlineNode,
 } from './types'

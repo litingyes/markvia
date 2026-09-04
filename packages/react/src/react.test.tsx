@@ -4,7 +4,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { createRoot } from 'react-dom/client'
 import { act, Component, createElement, type ReactNode } from 'react'
 import { describe, expect, it, vi } from 'vite-plus/test'
-import { createMarkdown } from '@markvia/core'
+import { createMarkdown, type MathInlineNode, type MarkdownParserExtension } from '@markvia/core'
 import { markdownFixtures } from '../../core/test/markdown-fixtures'
 import { canonicalHtml } from '../../core/test/markdown-test-utils'
 import { createReactRenderer, Markdown, renderReact } from './index'
@@ -33,6 +33,31 @@ function deferred<T>() {
     reject = rejectPromise
   })
   return { promise, resolve, reject }
+}
+
+const extensionParser: MarkdownParserExtension = {
+  name: 'renderer-test-extension',
+  mapNode(node, context) {
+    if (
+      typeof node !== 'object' ||
+      node === null ||
+      !('type' in node) ||
+      node.type !== 'code' ||
+      !('lang' in node) ||
+      node.lang !== 'test' ||
+      !('value' in node) ||
+      typeof node.value !== 'string'
+    ) {
+      return undefined
+    }
+
+    const range = context.range(node)
+    return [
+      context.createNode<MathInlineNode>('mathInline', range.start, range.end, {
+        value: node.value,
+      }),
+    ]
+  },
 }
 
 describe('@markvia/react', () => {
@@ -92,6 +117,39 @@ describe('@markvia/react', () => {
 
     expect(customMarkup).toContain('<section>text</section>')
     expect(factoryMarkup).toContain('&lt;div&gt;raw&lt;/div&gt;')
+  })
+
+  it('renders extension providers through the same IR and component contract', () => {
+    const runtime = createMarkdown({
+      plugins: [
+        {
+          name: 'renderer-test-plugin',
+          setup: (context) => {
+            context.addParserExtension(extensionParser)
+            context.addNodeRenderer('mathInline', {
+              render: (node) => ({
+                kind: 'element',
+                tag: 'span',
+                props: { 'data-value': node.value },
+                children: [{ kind: 'text', value: node.value }],
+              }),
+            })
+          },
+        },
+      ],
+    })
+    const CustomMath = (props: { children?: ReactNode }) =>
+      createElement('em', null, props.children)
+    const source = '```test\nx\n```'
+    const providerMarkup = renderToStaticMarkup(renderReact(runtime.toIR(runtime.parse(source))))
+    const markup = renderToStaticMarkup(
+      renderReact(runtime.toIR(runtime.parse(source)), {
+        components: { mathInline: CustomMath },
+      }),
+    )
+
+    expect(providerMarkup).toMatch(/<span[^>]*data-value="x"[^>]*>x<\/span>/)
+    expect(markup).toContain('<em>x</em>')
   })
 
   it('accepts document and stream inputs and rejects multiple inputs', async () => {

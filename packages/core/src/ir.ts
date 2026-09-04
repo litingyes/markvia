@@ -3,6 +3,8 @@ import type {
   CodeHighlighter,
   CodeNode,
   DocumentNode,
+  ExtensionNode,
+  ExtensionProvider,
   HighlightOutput,
   HighlightToken,
   ImageNode,
@@ -12,6 +14,7 @@ import type {
   MarkdownNode,
   RenderDocument,
   RenderElementNode,
+  RenderFragment,
   RenderPropValue,
   RenderNode,
   RenderRawNode,
@@ -25,6 +28,8 @@ import type {
 
 export interface IROptions {
   highlighter?: CodeHighlighter
+  nodeRenderers?: ReadonlyMap<ExtensionNode['type'], ExtensionProvider<ExtensionNode>>
+  fallback?: boolean
 }
 
 interface MapContext {
@@ -89,6 +94,228 @@ function normalizeHighlight(output: HighlightOutput): {
   blockStyle?: RenderStyle
 } {
   return Array.isArray(output) ? { tokens: output } : output
+}
+
+const safeFragmentTag = /^[a-z][a-z0-9-]*$/
+const safeFragmentAttribute = /^[a-zA-Z_:][a-zA-Z0-9_.:-]*$/
+const forbiddenFragmentTags = new Set([
+  'base',
+  'embed',
+  'form',
+  'iframe',
+  'link',
+  'meta',
+  'object',
+  'script',
+  'style',
+])
+
+function isRenderStyle(value: unknown): value is Record<string, string | number> {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+    return false
+  }
+
+  return Object.values(value).every(
+    (entry) => (typeof entry === 'string' || typeof entry === 'number') && Number.isFinite(entry),
+  )
+}
+
+function isRenderPropValue(value: unknown): value is RenderPropValue {
+  return (
+    typeof value === 'string' ||
+    (typeof value === 'number' && Number.isFinite(value)) ||
+    typeof value === 'boolean' ||
+    isRenderStyle(value)
+  )
+}
+
+function isSafeFragmentProps(props: Record<string, unknown>): boolean {
+  return Object.entries(props).every(([name, value]) => {
+    const normalizedName = name.toLowerCase()
+    if (
+      !safeFragmentAttribute.test(name) ||
+      normalizedName.startsWith('on') ||
+      normalizedName === 'children' ||
+      normalizedName === 'dangerouslysetinnerhtml' ||
+      normalizedName === 'key' ||
+      normalizedName === 'ref'
+    ) {
+      return false
+    }
+
+    if (
+      (normalizedName === 'href' || normalizedName === 'src' || normalizedName === 'xlink:href') &&
+      typeof value === 'string'
+    ) {
+      return isSafeUrl(value)
+    }
+
+    if (normalizedName === 'style' && typeof value === 'string') {
+      return false
+    }
+
+    return isRenderPropValue(value)
+  })
+}
+
+function isRenderFragment(value: unknown): value is RenderFragment {
+  if (typeof value !== 'object' || value === null || !('kind' in value)) {
+    return false
+  }
+
+  const fragment = value as Record<string, unknown>
+  if (fragment.kind === 'text') {
+    return typeof fragment.value === 'string'
+  }
+
+  if (fragment.kind !== 'element') {
+    return false
+  }
+
+  if (
+    typeof fragment.tag !== 'string' ||
+    !safeFragmentTag.test(fragment.tag) ||
+    forbiddenFragmentTags.has(fragment.tag) ||
+    !Array.isArray(fragment.children)
+  ) {
+    return false
+  }
+
+  if (fragment.props !== undefined) {
+    if (typeof fragment.props !== 'object' || fragment.props === null) {
+      return false
+    }
+
+    if (!isSafeFragmentProps(fragment.props as Record<string, unknown>)) {
+      return false
+    }
+  }
+
+  return fragment.children.every((child) => isRenderFragment(child))
+}
+
+function isExtensionNode(node: MarkdownNode): node is ExtensionNode {
+  return node.type === 'mathInline' || node.type === 'mathBlock' || node.type === 'diagram'
+}
+
+function extensionFallback(node: ExtensionNode): RenderNode[] {
+  const language = node.type === 'diagram' ? 'mermaid' : 'math'
+  const fallback = node.type === 'mathInline' ? 'math-inline' : language
+  const codeProps: Record<string, string | number | boolean> = {
+    'data-language': language,
+    'data-markvia-fallback': fallback,
+  }
+  if ('incomplete' in node && node.incomplete) {
+    codeProps['data-incomplete'] = 'true'
+  }
+
+  const code = element(
+    node,
+    'code',
+    [textNode(node, node.value, ':extension-fallback:value')],
+    codeProps,
+    ':extension-fallback:code',
+  )
+
+  if (node.type === 'mathInline') {
+    return [code]
+  }
+
+  return [
+    element(node, 'pre', [code], { 'data-markvia-fallback': fallback }, ':extension-fallback'),
+  ]
+}
+
+function decorateFragment(
+  node: ExtensionNode,
+  fragment: RenderFragment,
+  suffix: string,
+  root: boolean,
+): RenderNode {
+  if (fragment.kind === 'text') {
+    return {
+      kind: 'text',
+      id: `${node.id}${suffix}`,
+      sourceType: root ? node.type : 'fragment',
+      position: node.position,
+      value: fragment.value,
+    }
+  }
+
+  return {
+    kind: 'element',
+    id: `${node.id}${suffix}`,
+    sourceType: root ? node.type : 'fragment',
+    position: node.position,
+    tag: fragment.tag,
+    props: {
+      ...fragment.props,
+      'data-markvia-node-id': node.id,
+    },
+    children: fragment.children.map((child, index) =>
+      decorateFragment(node, child, `${suffix}:${index}`, false),
+    ),
+  }
+}
+
+function mapExtensionNode(node: ExtensionNode, options: IROptions): RenderNode[] {
+  if (options.fallback) {
+    return extensionFallback(node)
+  }
+
+  const renderer = options.nodeRenderers?.get(node.type)
+  if (!renderer) {
+    return extensionFallback(node)
+  }
+
+  if (renderer.isAsync) {
+    throw new Error('The configured extension provider is asynchronous; use renderAsync instead.')
+  }
+
+  let rendered: RenderFragment | Promise<RenderFragment>
+  try {
+    rendered = renderer.render(node)
+  } catch {
+    return extensionFallback(node)
+  }
+
+  if (
+    typeof rendered === 'object' &&
+    rendered !== null &&
+    'then' in rendered &&
+    typeof rendered.then === 'function'
+  ) {
+    throw new Error('The configured extension provider is asynchronous; use renderAsync instead.')
+  }
+
+  return isRenderFragment(rendered)
+    ? [decorateFragment(node, rendered, ':extension', true)]
+    : extensionFallback(node)
+}
+
+async function mapExtensionNodeAsync(
+  node: ExtensionNode,
+  options: IROptions,
+): Promise<RenderNode[]> {
+  if (options.fallback) {
+    return extensionFallback(node)
+  }
+
+  const renderer = options.nodeRenderers?.get(node.type)
+  if (!renderer) {
+    return extensionFallback(node)
+  }
+
+  let rendered: RenderFragment
+  try {
+    rendered = await renderer.render(node)
+  } catch {
+    return extensionFallback(node)
+  }
+
+  return isRenderFragment(rendered)
+    ? [decorateFragment(node, rendered, ':extension', true)]
+    : extensionFallback(node)
 }
 
 function mapChildren(
@@ -313,6 +540,10 @@ function mapImage(node: ImageNode): RenderElementNode {
 }
 
 function mapNode(node: MarkdownNode, options: IROptions, context: MapContext = {}): RenderNode[] {
+  if (isExtensionNode(node)) {
+    return mapExtensionNode(node, options)
+  }
+
   switch (node.type) {
     case 'text':
       return [textNode(node, node.value)]
@@ -482,6 +713,10 @@ async function mapChildrenAsync(nodes: MarkdownNode[], options: IROptions): Prom
 }
 
 async function mapNodeAsync(node: MarkdownNode, options: IROptions): Promise<RenderNode[]> {
+  if (isExtensionNode(node)) {
+    return mapExtensionNodeAsync(node, options)
+  }
+
   switch (node.type) {
     case 'code':
       return [await mapCodeAsync(node, options)]

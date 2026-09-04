@@ -1,0 +1,62 @@
+---
+title: 数学与 Mermaid 扩展
+description: Markvia 的可选数学和 Mermaid 语法插件。
+sidebar:
+  order: 4
+---
+
+数学和 Mermaid 是可选包，不会作为 `@markvia/core` 的依赖安装。
+
+```bash
+pnpm add @markvia/math @markvia/mermaid
+```
+
+只安装应用实际需要的插件即可：
+
+```ts
+import { createMarkdown } from '@markvia/core'
+import { createMathPlugin } from '@markvia/math'
+import { createMermaidPlugin } from '@markvia/mermaid'
+
+const runtime = createMarkdown({
+  plugins: [
+    createMathPlugin({ provider: mathProvider }),
+    createMermaidPlugin({ provider: mermaidProvider }),
+  ],
+})
+```
+
+## 数学语法
+
+````md
+行内公式：$x^2$
+
+$$
+\int_0^1 x^2 dx
+$$
+
+```math
+\frac{a}{b}
+```
+````
+
+未安装 `@markvia/math` 时，这些内容会保持普通 Markdown 文本或代码块。
+
+## Mermaid 语法
+
+````md
+```mermaid
+graph TD
+  A --> B
+```
+````
+
+未安装 `@markvia/mermaid` 时，Mermaid 会保持普通代码块。
+
+## Provider
+
+Provider 支持同步和异步渲染，但必须返回结构化 Render fragment，不能返回 raw HTML。Provider
+缺失或失败时，Markvia 会将源码显示为安全代码回退。
+
+如果不使用数学能力，就不要安装 `@markvia/math`，这样数学解析依赖也不会被安装。两个可选
+包都不会安装渲染引擎；只有需要实际渲染结果时，才单独安装引擎并接入 provider。

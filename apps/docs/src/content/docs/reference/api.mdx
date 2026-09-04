@@ -31,6 +31,32 @@ The main capabilities are:
 
 The standalone `parseMarkdown` and `documentToIR` functions are also exported for lower-level usage.
 
+## Optional extension packages
+
+Math and Mermaid are not dependencies of `@markvia/core`. Install and register only the packages
+your application needs:
+
+```bash
+pnpm add @markvia/math
+pnpm add @markvia/mermaid
+```
+
+```ts
+import { createMathPlugin } from '@markvia/math'
+import { createMermaidPlugin } from '@markvia/mermaid'
+
+const runtime = createMarkdown({
+  plugins: [
+    createMathPlugin({ provider: mathProvider }),
+    createMermaidPlugin({ provider: mermaidProvider }),
+  ],
+})
+```
+
+If math is not used, omit `@markvia/math` so its parser dependencies are not installed.
+Neither optional package installs a rendering engine. Providers return structured Render fragments,
+support sync and async rendering, and fall back to safe source code when unavailable.
+
 ## `@markvia/shiki`
 
 ```ts

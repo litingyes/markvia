@@ -20,9 +20,11 @@ function document(children: MarkdownNode[], id = 'document'): MarkdownDocument {
 
 function runtimeFor(snapshots: Record<string, MarkdownDocument>): MarkdownRuntime {
   return {
+    requiresAsyncIR: false,
     parse: (source) => snapshots[source] ?? document([]),
     toIR: () => ({ kind: 'root', id: 'ir', children: [] }),
     toIRAsync: async () => ({ kind: 'root', id: 'ir', children: [] }),
+    toIRFallback: () => ({ kind: 'root', id: 'ir', children: [] }),
     render: () => undefined,
     renderAsync: async () => undefined,
     createStream: () => {

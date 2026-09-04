@@ -13,7 +13,14 @@ interface BlockMatch {
 }
 
 function firstText(node: MarkdownNode): string {
-  if (node.type === 'text' || node.type === 'inlineCode' || node.type === 'code') {
+  if (
+    node.type === 'text' ||
+    node.type === 'inlineCode' ||
+    node.type === 'code' ||
+    node.type === 'mathInline' ||
+    node.type === 'mathBlock' ||
+    node.type === 'diagram'
+  ) {
     return node.value
   }
   if ('children' in node) {
@@ -31,6 +38,10 @@ function signature(node: MarkdownNode): string {
       return `${node.type}:${node.level}:${anchor}`
     case 'code':
       return `${node.type}:${node.language ?? ''}`
+    case 'mathBlock':
+      return `${node.type}:math`
+    case 'diagram':
+      return `${node.type}:${node.language}`
     case 'list':
       return `${node.type}:${node.ordered ? 'ordered' : 'unordered'}`
     default:
@@ -67,6 +78,12 @@ function contentKey(node: MarkdownNode): string {
       return `${node.type}:${node.ordered}:${node.start ?? ''}:${node.spread}:${node.children.map(contentKey).join('|')}`
     case 'code':
       return `${node.type}:${node.language ?? ''}:${node.meta ?? ''}:${node.value}:${node.incomplete}`
+    case 'mathInline':
+      return `${node.type}:${node.value}`
+    case 'mathBlock':
+      return `${node.type}:${node.meta ?? ''}:${node.value}:${node.incomplete}`
+    case 'diagram':
+      return `${node.type}:${node.language}:${node.meta ?? ''}:${node.value}:${node.incomplete}`
     case 'thematicBreak':
     case 'break':
       return node.type

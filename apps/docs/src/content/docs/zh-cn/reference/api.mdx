@@ -31,6 +31,31 @@ const stream = runtime.createStream()
 
 此外，`parseMarkdown` 和 `documentToIR` 也会导出，适合更底层的使用场景。
 
+## 可选扩展包
+
+数学和 Mermaid 不属于 `@markvia/core` 的默认依赖。按需安装并显式注册：
+
+```bash
+pnpm add @markvia/math
+pnpm add @markvia/mermaid
+```
+
+```ts
+import { createMathPlugin } from '@markvia/math'
+import { createMermaidPlugin } from '@markvia/mermaid'
+
+const runtime = createMarkdown({
+  plugins: [
+    createMathPlugin({ provider: mathProvider }),
+    createMermaidPlugin({ provider: mermaidProvider }),
+  ],
+})
+```
+
+如果不使用数学能力，就不要安装 `@markvia/math`，这样数学解析依赖也不会被安装。
+两个可选包都不会安装渲染引擎。Provider 返回结构化 Render fragment，支持同步和异步渲染；
+缺失或失败时使用安全源码回退。
+
 ## `@markvia/shiki`
 
 ```ts

@@ -21,18 +21,34 @@ class MarkdownRuntimeImpl implements MarkdownRuntime {
     this.highlighter = options.highlighter
   }
 
+  get requiresAsyncIR(): boolean {
+    return this.highlighter?.isAsync === true || this.pipeline.requiresAsyncIR
+  }
+
   parse(source: string): MarkdownDocument {
-    return this.pipeline.document(parseMarkdown(source))
+    return this.pipeline.document(
+      parseMarkdown(source, { extensions: this.pipeline.getParserExtensions() }),
+    )
   }
 
   toIR(document: MarkdownDocument) {
-    const options = this.highlighter ? { highlighter: this.highlighter } : {}
+    const options = {
+      ...(this.highlighter ? { highlighter: this.highlighter } : {}),
+      nodeRenderers: this.pipeline.getNodeRenderers(),
+    }
     return this.pipeline.ir(documentToIR(document, options))
   }
 
   async toIRAsync(document: MarkdownDocument) {
-    const options = this.highlighter ? { highlighter: this.highlighter } : {}
+    const options = {
+      ...(this.highlighter ? { highlighter: this.highlighter } : {}),
+      nodeRenderers: this.pipeline.getNodeRenderers(),
+    }
     return this.pipeline.ir(await documentToIRAsync(document, options))
+  }
+
+  toIRFallback(document: MarkdownDocument) {
+    return this.pipeline.ir(documentToIR(document, { fallback: true }))
   }
 
   render<T>(source: string | MarkdownDocument, renderer: Renderer<T>): T {

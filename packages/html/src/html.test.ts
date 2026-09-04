@@ -4,10 +4,15 @@ import { markdownFixtures } from '../../core/test/markdown-fixtures'
 import { canonicalHtml } from '../../core/test/markdown-test-utils'
 import { createHTMLRenderer, htmlRenderer } from './index'
 import { renderHTML } from './index'
-import type { RenderDocument, RenderNode } from '@markvia/core'
+import type { DiagramNode, MarkdownDocument, RenderDocument, RenderNode } from '@markvia/core'
 
 function withoutNodeIds(value: string): string {
   return value.replace(/ data-markvia-node-id="[^"]*"/g, '')
+}
+
+const position = {
+  start: { offset: 0, line: 1, column: 1 },
+  end: { offset: 1, line: 1, column: 2 },
 }
 
 describe('@markvia/html', () => {
@@ -63,6 +68,44 @@ describe('@markvia/html', () => {
 
     expect(html).toContain('style="background-color:#111;color:#eee"')
     expect(html).toContain('style="color:#fff;background-color:#222"')
+  })
+
+  it('renders extension provider fragments through the shared HTML IR', () => {
+    const runtime = createMarkdown({
+      plugins: [
+        {
+          name: 'html-extension-provider',
+          setup: (context) =>
+            context.addNodeRenderer<DiagramNode>('diagram', {
+              render: (node) => ({
+                kind: 'element',
+                tag: 'svg',
+                props: { 'data-language': node.language },
+                children: [{ kind: 'text', value: node.value }],
+              }),
+            }),
+        },
+      ],
+    })
+    const diagram: DiagramNode = {
+      id: 'diagram',
+      type: 'diagram',
+      position,
+      language: 'mermaid',
+      meta: null,
+      value: 'graph TD',
+      incomplete: false,
+    }
+    const document: MarkdownDocument = {
+      id: 'document',
+      type: 'document',
+      position,
+      children: [diagram],
+    }
+
+    const html = runtime.render(document, htmlRenderer)
+
+    expect(html).toBe('<svg data-language="mermaid" data-markvia-node-id="diagram">graph TD</svg>')
   })
 
   it('filters unsafe attributes and serializes every supported attribute shape', () => {

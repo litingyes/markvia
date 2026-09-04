@@ -1,0 +1,37 @@
+{
+  "name": "@markvia/mermaid",
+  "version": "0.1.0",
+  "description": "Mermaid diagram plugin for Markvia",
+  "bugs": {
+    "url": "https://github.com/litingyes/markvia/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/litingyes/markvia.git",
+    "directory": "packages/mermaid"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": {
+        "import": "./dist/index.d.mts",
+        "require": "./dist/index.d.cts"
+      },
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "vp pack src/index.ts"
+  },
+  "dependencies": {
+    "@markvia/core": "workspace:*"
+  }
+}
