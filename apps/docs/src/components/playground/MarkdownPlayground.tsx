@@ -180,18 +180,28 @@ export default function MarkdownPlayground({ locale = 'en', initialContent }: Pr
   }
 
   return (
-    <div className="markvia-playground">
-      <header className="markvia-playground__intro">
-        <p className="markvia-playground__eyebrow">{copy.eyebrow}</p>
-        <h2>{copy.title}</h2>
-        <p>{copy.description}</p>
+    <div className="mx-auto max-w-7xl">
+      <header className="mx-auto mb-8 max-w-4xl text-center">
+        <p className="mb-3 text-xs font-bold uppercase tracking-[0.12em] text-markvia-accent">
+          {copy.eyebrow}
+        </p>
+        <h2 className="m-0 text-3xl font-bold tracking-tight text-markvia-white md:text-5xl">
+          {copy.title}
+        </h2>
+        <p className="mx-auto mt-3 mb-0 max-w-3xl text-[1.05rem] leading-7 text-markvia-muted">
+          {copy.description}
+        </p>
       </header>
 
-      <section className="markvia-playground__workspace" aria-label={copy.title}>
-        <div className="markvia-playground__toolbar">
-          <label className="markvia-playground__select">
+      <section
+        className="overflow-hidden rounded-xl border border-markvia-border bg-markvia-bg shadow-xl"
+        aria-label={copy.title}
+      >
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-markvia-border bg-markvia-surface px-4 py-3 max-sm:items-stretch">
+          <label className="grid min-w-60 gap-1 text-[0.7rem] font-bold uppercase tracking-wider text-markvia-muted max-sm:w-full">
             <span>{copy.presetLabel}</span>
             <select
+              className="min-h-9 rounded-lg border border-markvia-border bg-markvia-black px-3 py-2 font-[inherit] text-markvia-white outline-none focus-visible:outline-2 focus-visible:outline-markvia-accent focus-visible:outline-offset-2"
               aria-label={copy.presetLabel}
               value={selectedPreset}
               onChange={(event) => handlePreset(event.currentTarget.value)}
@@ -206,27 +216,27 @@ export default function MarkdownPlayground({ locale = 'en', initialContent }: Pr
           </label>
 
           <div
-            className="markvia-playground__toolbar-actions"
+            className="ml-auto flex flex-wrap items-center justify-end gap-1 border-l border-markvia-border pl-3 max-sm:ml-0 max-sm:w-full max-sm:justify-start max-sm:border-l-0 max-sm:pl-0"
             role="group"
             aria-label={copy.actionsLabel}
           >
             <button
               type="button"
-              className="markvia-playground__toolbar-button markvia-playground__quiet-action"
+              className="min-h-9 cursor-pointer rounded-md border border-transparent bg-transparent px-3 py-2 font-[inherit] text-sm leading-tight text-markvia-muted outline-none transition-colors hover:bg-markvia-hover focus-visible:outline-2 focus-visible:outline-markvia-accent focus-visible:outline-offset-2"
               onClick={handleReset}
             >
               {copy.reset}
             </button>
             <button
               type="button"
-              className="markvia-playground__toolbar-button markvia-playground__secondary-action"
+              className="min-h-9 cursor-pointer rounded-md border border-markvia-border bg-transparent px-3 py-2 font-[inherit] text-sm leading-tight text-markvia-muted outline-none transition-colors hover:border-markvia-accent hover:bg-markvia-hover hover:text-markvia-white focus-visible:outline-2 focus-visible:outline-markvia-accent focus-visible:outline-offset-2"
               onClick={handleCopySource}
             >
               {copy.copySource}
             </button>
             <button
               type="button"
-              className="markvia-playground__toolbar-button markvia-playground__primary-action"
+              className="min-h-9 cursor-pointer rounded-md border border-markvia-accent bg-markvia-accent px-3 py-2 font-[inherit] text-sm font-bold leading-tight text-markvia-black outline-none transition-colors hover:border-markvia-accent focus-visible:outline-2 focus-visible:outline-markvia-accent focus-visible:outline-offset-2"
               onClick={handleShare}
             >
               {copy.share}
@@ -234,14 +244,17 @@ export default function MarkdownPlayground({ locale = 'en', initialContent }: Pr
           </div>
         </div>
 
-        <div className="markvia-playground__controls">
-          <div className="markvia-playground__editor-pane">
-            <div className="markvia-playground__section-heading">
+        <div className="grid gap-px bg-markvia-border md:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
+          <div className="min-w-0 bg-markvia-bg p-4 lg:p-5">
+            <div className="mb-3 flex items-center justify-between gap-4 text-xs font-bold uppercase tracking-wider text-markvia-white">
               <label htmlFor="markvia-playground-editor">{copy.editorLabel}</label>
-              <span>{copy.characterCount(state.content.length)}</span>
+              <span className="text-xs font-medium normal-case tracking-normal text-markvia-subtle">
+                {copy.characterCount(state.content.length)}
+              </span>
             </div>
             <textarea
               id="markvia-playground-editor"
+              className="block min-h-96 w-full resize-y rounded-lg border border-markvia-border bg-markvia-black p-4 font-mono text-sm leading-[1.65] text-markvia-white outline-none focus-visible:outline-2 focus-visible:outline-markvia-accent focus-visible:outline-offset-2"
               value={state.content}
               aria-label={copy.editorLabel}
               autoCapitalize="off"
@@ -256,14 +269,16 @@ export default function MarkdownPlayground({ locale = 'en', initialContent }: Pr
             />
           </div>
 
-          <div className="markvia-playground__preview-pane">
-            <div className="markvia-playground__section-heading">
+          <div className="flex min-h-[28rem] min-w-0 flex-col bg-markvia-bg p-4 lg:p-5">
+            <div className="mb-3 flex items-center justify-between gap-4 text-xs font-bold uppercase tracking-wider text-markvia-white">
               <span>{copy.previewLabel}</span>
-              <span>{copy.renderers[state.renderer]}</span>
+              <span className="text-xs font-medium normal-case tracking-normal text-markvia-subtle">
+                {copy.renderers[state.renderer]}
+              </span>
             </div>
 
             <div
-              className="markvia-playground__renderer-tabs"
+              className="mb-3 flex flex-wrap items-center gap-0.5 rounded-lg border border-markvia-border bg-markvia-black p-1"
               role="tablist"
               aria-label={copy.rendererLabel}
             >
@@ -271,6 +286,7 @@ export default function MarkdownPlayground({ locale = 'en', initialContent }: Pr
                 <button
                   key={renderer}
                   type="button"
+                  className="min-h-8 cursor-pointer rounded border-0 bg-transparent px-3 py-1 font-[inherit] text-xs text-markvia-subtle outline-none hover:bg-markvia-hover hover:text-markvia-white aria-selected:bg-markvia-hover aria-selected:text-markvia-white aria-selected:shadow-sm focus-visible:outline-2 focus-visible:outline-markvia-accent focus-visible:outline-offset-2"
                   role="tab"
                   aria-selected={state.renderer === renderer}
                   aria-controls={`markvia-${renderer}-preview`}
@@ -283,10 +299,10 @@ export default function MarkdownPlayground({ locale = 'en', initialContent }: Pr
 
             <div
               id={`markvia-${state.renderer}-preview`}
-              className="markvia-playground__output markvia-playground__markdown"
+              className="m-0 min-h-[19rem] min-w-0 flex-1 overflow-auto rounded-xl border border-markvia-border bg-markvia-bg p-5 text-markvia-text [&>div>*:first-child]:mt-0 [&>div>*:last-child]:mb-0"
             >
               {renderState.error ? (
-                <p className="markvia-playground__error" role="alert">
+                <p className="m-0 text-markvia-error" role="alert">
                   {errorMessage(renderState.error)}
                 </p>
               ) : (
@@ -296,11 +312,11 @@ export default function MarkdownPlayground({ locale = 'en', initialContent }: Pr
           </div>
         </div>
 
-        <div className="markvia-playground__inspect">
-          <div className="markvia-playground__inspect-heading">
+        <div className="min-w-0 border-t border-markvia-border bg-markvia-bg p-4 lg:p-5">
+          <div className="flex items-center justify-between gap-4 text-xs font-bold uppercase tracking-wider text-markvia-white max-sm:items-start max-sm:flex-col">
             <span>{copy.panelLabel}</span>
             <div
-              className="markvia-playground__panel-tabs"
+              className="flex flex-wrap items-center gap-0.5 rounded-lg border border-markvia-border bg-markvia-black p-1"
               role="tablist"
               aria-label={copy.panelLabel}
             >
@@ -308,6 +324,7 @@ export default function MarkdownPlayground({ locale = 'en', initialContent }: Pr
                 <button
                   key={panel}
                   type="button"
+                  className="min-h-8 cursor-pointer rounded border-0 bg-transparent px-3 py-1 font-[inherit] text-xs text-markvia-subtle outline-none hover:bg-markvia-hover hover:text-markvia-white aria-selected:bg-markvia-hover aria-selected:text-markvia-white aria-selected:shadow-sm focus-visible:outline-2 focus-visible:outline-markvia-accent focus-visible:outline-offset-2"
                   role="tab"
                   aria-selected={state.panel === panel}
                   onClick={() => setPanel(panel)}
@@ -319,24 +336,34 @@ export default function MarkdownPlayground({ locale = 'en', initialContent }: Pr
           </div>
 
           {state.panel === 'preview' && (
-            <p className="markvia-playground__inspect-hint">
+            <p className="mt-4 mb-0 text-markvia-subtle">
               {copy.renderers[state.renderer]} renderer ·{' '}
               {copy.characterCount(state.content.length)}
             </p>
           )}
           {state.panel === 'html' && (
-            <pre className="markvia-playground__code-output" tabIndex={0}>
+            <pre
+              className="mt-4 max-h-96 overflow-auto rounded-xl border border-markvia-border bg-markvia-black p-4 text-[0.8rem] leading-[1.6] whitespace-pre text-markvia-muted"
+              tabIndex={0}
+            >
               <code>{renderState.html ?? ''}</code>
             </pre>
           )}
           {state.panel === 'ast' && (
-            <pre className="markvia-playground__code-output" tabIndex={0}>
+            <pre
+              className="mt-4 max-h-96 overflow-auto rounded-xl border border-markvia-border bg-markvia-black p-4 text-[0.8rem] leading-[1.6] whitespace-pre text-markvia-muted"
+              tabIndex={0}
+            >
               <code>{snapshot}</code>
             </pre>
           )}
         </div>
 
-        <p className="markvia-playground__feedback" role="status" aria-live="polite">
+        <p
+          className="m-0 min-h-[1.4rem] px-4 pb-4 text-xs text-markvia-subtle"
+          role="status"
+          aria-live="polite"
+        >
           {feedback}
         </p>
       </section>

@@ -15,10 +15,14 @@ const ir = runtime.toIR(document)
 const snapshot = JSON.stringify({ document, ir }, null, 2)
 ---
 
-<div class="markvia-demo">
-  <div class="markvia-demo__label">{copy.astLabel}</div>
+<div class="my-4 rounded-xl border border-markvia-border bg-markvia-surface p-4">
+  <div class="mb-3 text-xs font-bold uppercase tracking-wider text-markvia-muted">
+    {copy.astLabel}
+  </div>
   <details>
     <summary>{copy.astSummary}</summary>
-    <pre class="markvia-demo__source markvia-demo__tree"><code>{snapshot}</code></pre>
+    <pre
+      class="max-h-96 overflow-auto whitespace-pre-wrap break-words text-sm text-markvia-subtle"
+    ><code>{snapshot}</code></pre>
   </details>
 </div>

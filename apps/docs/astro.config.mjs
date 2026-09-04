@@ -2,6 +2,7 @@ import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'astro/config'
 import react from '@astrojs/react'
 import starlight from '@astrojs/starlight'
+import tailwindcss from '@tailwindcss/vite'
 import vue from '@astrojs/vue'
 
 const sourcePath = (path) => fileURLToPath(new URL(path, import.meta.url))
@@ -46,10 +47,11 @@ export default defineConfig({
           items: [{ autogenerate: { directory: 'reference' } }],
         },
       ],
-      customCss: ['./src/styles/custom.css'],
+      customCss: ['./src/styles/global.css'],
     }),
   ],
   vite: {
+    plugins: [tailwindcss()],
     resolve: {
       alias: {
         '@markvia/core': sourcePath('../../packages/core/src/index.ts'),

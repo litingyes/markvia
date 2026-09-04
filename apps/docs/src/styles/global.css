@@ -1,0 +1,31 @@
+@layer base, starlight, theme, components, utilities;
+
+@import '@astrojs/starlight-tailwind';
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);
+
+@theme inline {
+  --color-markvia-accent: var(--sl-color-text-accent);
+  --color-markvia-bg: var(--sl-color-bg);
+  --color-markvia-border: var(--sl-color-gray-5);
+  --color-markvia-error: var(--sl-color-red-high);
+  --color-markvia-hover: var(--sl-color-gray-6);
+  --color-markvia-muted: var(--sl-color-gray-2);
+  --color-markvia-surface: var(--sl-color-gray-7);
+  --color-markvia-subtle: var(--sl-color-gray-3);
+  --color-markvia-text: var(--sl-color-text);
+  --color-markvia-white: var(--sl-color-white);
+  --color-markvia-black: var(--sl-color-black);
+}
+
+:root {
+  --sl-color-accent-low: #d9f7f0;
+  --sl-color-accent: #0f8a78;
+  --sl-color-accent-high: #075246;
+}
+
+[data-theme='dark'] {
+  --sl-color-accent-low: #073b35;
+  --sl-color-accent: #56d8c3;
+  --sl-color-accent-high: #c1fff3;
+}

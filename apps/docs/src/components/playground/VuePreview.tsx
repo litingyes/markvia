@@ -37,15 +37,15 @@ export default function VuePreview({ ir, loadingLabel, errorLabel }: Props) {
   }, [ir])
 
   return (
-    <div className="markvia-playground__vue-preview">
+    <div className="min-h-full">
       <div ref={containerRef} />
       {status === 'loading' && (
-        <p className="markvia-playground__loading" role="status">
+        <p className="m-0 text-markvia-subtle" role="status">
           {loadingLabel}
         </p>
       )}
       {status === 'error' && (
-        <p className="markvia-playground__error" role="alert">
+        <p className="m-0 text-markvia-error" role="alert">
           {errorLabel}
         </p>
       )}

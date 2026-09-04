@@ -42,10 +42,12 @@ export default function ReactStreamingDemo({ locale = 'en' }: Props) {
   }, [])
 
   return (
-    <div className="markvia-demo">
-      <div className="markvia-demo__label">{copy.reactStreaming}</div>
-      <p className="markvia-demo__status">{status}</p>
-      <div className="markvia-demo__output">
+    <div className="my-4 rounded-xl border border-markvia-border bg-markvia-surface p-4">
+      <div className="mb-3 text-xs font-bold uppercase tracking-wider text-markvia-muted">
+        {copy.reactStreaming}
+      </div>
+      <p className="m-0 text-sm text-markvia-muted">{status}</p>
+      <div className="mt-3 min-w-0 rounded-lg border border-markvia-border bg-markvia-bg p-4">
         <Markdown document={document} />
       </div>
     </div>

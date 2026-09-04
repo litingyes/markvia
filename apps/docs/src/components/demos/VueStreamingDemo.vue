@@ -46,10 +46,12 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="markvia-demo">
-    <div class="markvia-demo__label">{{ copy.vueStreaming }}</div>
-    <p class="markvia-demo__status">{{ status }}</p>
-    <div class="markvia-demo__output">
+  <div class="my-4 rounded-xl border border-markvia-border bg-markvia-surface p-4">
+    <div class="mb-3 text-xs font-bold uppercase tracking-wider text-markvia-muted">
+      {{ copy.vueStreaming }}
+    </div>
+    <p class="m-0 text-sm text-markvia-muted">{{ status }}</p>
+    <div class="mt-3 min-w-0 rounded-lg border border-markvia-border bg-markvia-bg p-4">
       <Markdown :document="document" />
     </div>
   </div>

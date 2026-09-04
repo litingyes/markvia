@@ -14,10 +14,14 @@ const copy = demoCopy[locale]
 const html = createMarkdown().render(content, htmlRenderer)
 ---
 
-<div class="markvia-demo">
-  <div class="markvia-demo__label">{label ?? copy.htmlRenderer}</div>
-  <div class="markvia-demo__columns">
-    <div class="markvia-demo__output" set:html={html}></div>
-    <pre class="markvia-demo__source"><code>{html}</code></pre>
+<div class="my-4 rounded-xl border border-markvia-border bg-markvia-surface p-4">
+  <div class="mb-3 text-xs font-bold uppercase tracking-wider text-markvia-muted">
+    {label ?? copy.htmlRenderer}
+  </div>
+  <div class="grid gap-4 md:grid-cols-2">
+    <div class="min-w-0 rounded-lg border border-markvia-border bg-markvia-bg p-4" set:html={html}></div>
+    <pre
+      class="min-w-0 overflow-x-auto whitespace-pre-wrap break-words text-sm text-markvia-subtle"
+    ><code>{html}</code></pre>
   </div>
 </div>
