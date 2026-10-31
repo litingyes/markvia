@@ -28,7 +28,7 @@
     "@vue/server-renderer": "^3.5.42",
     "bumpp": "^12.2.2",
     "changelogen": "^0.6.2",
-    "happy-dom": "^20.13.1",
+    "happy-dom": "^21.0.4",
     "parse5": "^7.3.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
